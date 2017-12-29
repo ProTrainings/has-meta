@@ -26,7 +26,7 @@ module HasMeta
     def has_meta(*attributes)
       class_eval do
         has_many :meta_data, as: :meta_model, dependent: destroy, class_name: '::HasMeta::MetaData'
-        include ActiveRecord::Has::Meta::InstanceMethods
+        include HasMeta::InstanceMethods
       end
       
       options = attributes.pop if attributes.last.is_a? Hash
@@ -159,7 +159,7 @@ module HasMeta
       end
     end #ends module Helper
     
-    # This needs to live in ActiveRecord::Has::Meta so that it's available to all active record instances
+    # This needs to live in HasMeta so that it's available to all active record instances
     define_method :meta_attributes do |inherit=false|
       begin
         self.class.meta_attributes(inherit)
