@@ -1,5 +1,3 @@
-module Has
-  module Meta
-    VERSION = "0.1.0"
-  end
+module HasMeta
+  VERSION = "0.1.0"
 end
