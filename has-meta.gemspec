@@ -5,7 +5,7 @@ require "has/meta/version"
 
 Gem::Specification.new do |spec|
   spec.name          = "has-meta"
-  spec.version       = Has::Meta::VERSION
+  spec.version       = HasMeta::VERSION
   spec.authors       = ["Dan Drust"]
   spec.email         = ["dan.drust@protrainings.com"]
 
