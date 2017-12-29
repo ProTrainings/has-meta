@@ -1,6 +1,8 @@
 module HasMeta
   class MetaData < ApplicationRecord
     
+    belongs_to :meta_model, polymorphic: true
+
     def value
       
       return text_value if text_value!=nil
