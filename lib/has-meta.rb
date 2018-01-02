@@ -1,5 +1,7 @@
 require "has/meta/version"
 module HasMeta
+  extend ActiveSupport::Concern
+
   def self.included(base)
     base.extend(ClassMethods)
   end
@@ -211,6 +213,5 @@ module ActiveModel
     alias :assign_attributes :filter_meta_attributes
   end
 end
-ActiveSupport.on_load(:active_record) do
-  extend HasMeta
-end
+
+ActiveRecord::Base.send(:include, 'HasMeta')
