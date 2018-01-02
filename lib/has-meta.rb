@@ -2,11 +2,11 @@ require "has_meta/version"
 module HasMeta
   #extend ActiveSupport::Concern
 
-  def self.included(base)
-    base.extend(ClassMethods)
-  end
+#  def self.included(base)
+#    base.extend(ClassMethods)
+#  end
   
-  module ClassMethods
+  # module ClassMethods
     # This needs to live outside of has_meta so that it's available to all classes
     def meta_attributes(inherit=false)
       begin
@@ -91,7 +91,7 @@ module HasMeta
         end # ends attributes.each
       end # ends if attributes.present?
     end # ends def has_meta
-  end # ends module ClassMethods
+  # end # ends module ClassMethods
 
   module InstanceMethods
  
