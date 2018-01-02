@@ -1,4 +1,4 @@
-require "has/meta/version"
+require "has_meta/version"
 module HasMeta
   extend ActiveSupport::Concern
 
