@@ -27,7 +27,7 @@ module HasMeta
     # convenience methods for the attributes passed in (as symbols)
     def has_meta(*attributes)
       class_eval do
-        has_many :meta_data, as: :meta_model, dependent: destroy, class_name: '::HasMeta::MetaData'
+        has_many :meta_data, as: :meta_model, dependent: :destroy, class_name: '::HasMeta::MetaData'
         include HasMeta::InstanceMethods
       end
       
