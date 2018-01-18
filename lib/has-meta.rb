@@ -71,7 +71,7 @@ require_relative 'has_meta/meta_data'
             define_singleton_method :"find_by_#{attribute}_id" do |value|
               data_type = Helper.get_type value
               data_type = :int if data_type == :integer
-              self.find_by_id(Metadata.where(meta_model_type: self.arel_table.name, key: "#{attribute}_id", "#{data_type.to_s}_value": value ).first.try(:meta_model_id))
+              self.find_by_id(MetaData.where(meta_model_type: self.arel_table.name, key: "#{attribute}_id", "#{data_type.to_s}_value": value ).first.try(:meta_model_id))
             end
           
           else
@@ -86,7 +86,7 @@ require_relative 'has_meta/meta_data'
             define_singleton_method :"find_by_#{attribute}" do |value|
               data_type = Helper.get_type value
               data_type = :int if data_type == :integer
-              self.find_by_id(Metadata.where(meta_model_type: self.arel_table.name, key: attribute, "#{data_type.to_s}_value": value ).first.try(:meta_model_id))
+              self.find_by_id(MetaData.where(meta_model_type: self.arel_table.name, key: attribute, "#{data_type.to_s}_value": value ).first.try(:meta_model_id))
             end
           end
         
@@ -102,14 +102,14 @@ require_relative 'has_meta/meta_data'
       return false unless self.persisted?
       case val
       when {}
-        meta = Metadata.where(:key => key, :meta_model_type => self.arel_table.name, :meta_model_id => self.id)
+        meta = MetaData.where(:key => key, :meta_model_type => self.arel_table.name, :meta_model_id => self.id)
         return meta.present? ? meta.last.value : nil
       when nil, ''
-        return Metadata.where(:key => key, :meta_model_type => self.arel_table.name, :meta_model_id => self.id).destroy_all
+        return MetaData.where(:key => key, :meta_model_type => self.arel_table.name, :meta_model_id => self.id).destroy_all
       end
       
       #we are setting a value
-      meta = Metadata.where(:key => key, :meta_model_type => self.arel_table.name, :meta_model_id => self.id).first_or_create
+      meta = MetaData.where(:key => key, :meta_model_type => self.arel_table.name, :meta_model_id => self.id).first_or_create
       
       data_type = Helper.get_type val
       if data_type == :integer and !val.is_a? Integer
@@ -122,11 +122,11 @@ require_relative 'has_meta/meta_data'
     end #ends def meta
       
     def list_meta_keys
-        meta = Metadata.where(:meta_model_type => self.arel_table.name, :meta_model_id => self.id).pluck(:key)
+        meta = MetaData.where(:meta_model_type => self.arel_table.name, :meta_model_id => self.id).pluck(:key)
     end
     
     def remove_meta(key)
-      Metadata.where(:key => key, :meta_model_type => self.arel_table.name, :meta_model_id => self.id).destroy_all
+      MetaData.where(:key => key, :meta_model_type => self.arel_table.name, :meta_model_id => self.id).destroy_all
     end
       
   end #ends module InstanceMethods
