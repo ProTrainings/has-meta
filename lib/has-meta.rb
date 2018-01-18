@@ -1,31 +1,33 @@
 require "has_meta/version"
 module HasMeta
-  #extend ActiveSupport::Concern
-
+require_relative 'has_meta/meta_data'
+# take this out because we're no including this in any particular places - it's aviabale 
+# to all models via active record
 #  def self.included(base)
 #    base.extend(ClassMethods)
 #  end
   
-  # module ClassMethods
-    # This needs to live outside of has_meta so that it's available to all classes
     def meta_attributes(inherit=false)
-      begin
-        if inherit
-          self.class_variables.select{ |x| x =~ /meta_attributes/}
-            .map{|v| self.class_variable_get v }
-            .flatten
-        else
-          self.class_variable_get :"@@meta_attributes_#{self.name.underscore}"
-        end
-      rescue
-        nil
-      end
+      # begin
+      #   if inherit
+      #     self.class_variables.select{ |x| x =~ /meta_attributes/}
+      #       .map{|v| self.class_variable_get v }
+      #       .flatten
+      #   else
+      #     self.class_variable_get :"@@meta_attributes_#{self.name.underscore}"
+      #   end
+      # rescue
+      nil
+      # end
     end
     
     # calling has_meta without arguments will allow access to the meta method in the model
     # calling has_meta with arguments will allow access to meta and define getter/setter
     # convenience methods for the attributes passed in (as symbols)
     def has_meta(*attributes)
+      class_attribute :meta_attributes, instance_predicate: false, instance_writer: false
+      meta_attributes = attributes.to_a.flatten.compact.map(&:to_sym)
+
       class_eval do
         has_many :meta_data, as: :meta_model, dependent: :destroy, class_name: '::HasMeta::MetaData'
         include HasMeta::InstanceMethods
