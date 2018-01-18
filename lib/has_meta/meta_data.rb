@@ -1,5 +1,5 @@
 module HasMeta
-  class MetaData < ::ApplicationRecord
+  class MetaData < ::ActiveRecord::Base
     
     belongs_to :meta_model, polymorphic: true
 
