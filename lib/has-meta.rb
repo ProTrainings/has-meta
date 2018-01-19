@@ -1,99 +1,119 @@
 require "has_meta/version"
 module HasMeta
 require_relative 'has_meta/meta_data'
-# take this out because we're no including this in any particular places - it's aviabale 
-# to all models via active record
-#  def self.included(base)
-#    base.extend(ClassMethods)
-#  end
   
-    def meta_attributes(inherit=false)
-      # begin
-      #   if inherit
-      #     self.class_variables.select{ |x| x =~ /meta_attributes/}
-      #       .map{|v| self.class_variable_get v }
-      #       .flatten
-      #   else
-      #     self.class_variable_get :"@@meta_attributes_#{self.name.underscore}"
-      #   end
-      # rescue
+    def meta_attributes
       nil
-      # end
     end
     
-    # calling has_meta without arguments will allow access to the meta method in the model
-    # calling has_meta with arguments will allow access to meta and define getter/setter
-    # convenience methods for the attributes passed in (as symbols)
     def has_meta(*attributes)
-      class_attribute :meta_attributes, instance_predicate: false, instance_writer: false
-      meta_attributes = attributes.to_a.flatten.compact.map(&:to_sym)
+      options = attributes.pop if attributes.last.is_a? Hash
+      attributes = attributes.to_a.flatten.compact.map(&:to_sym)
+
+      if self.meta_attributes.present? 
+        self.meta_attributes += attributes
+      else
+        class_attribute :meta_attributes, instance_predicate: false, instance_writer: false
+        self.meta_attributes = attributes
+      end
 
       class_eval do
         has_many :meta_data, as: :meta_model, dependent: :destroy, class_name: '::HasMeta::MetaData'
         include HasMeta::InstanceMethods
-      end
-      
-      options = attributes.pop if attributes.last.is_a? Hash
-      
-      if attributes.present?
-      
-        self.around_save    :update_meta_attributes_on_save
-        self.after_destroy  :delete_meta_attributes_on_destroy
-      
-        self.class_variable_set :"@@meta_attributes_#{self.name.underscore}", attributes
-      
-        attributes.each do |attribute|
-          begin
-            klass = const_get(attribute.to_s.classify)
-            klass = nil unless klass.in? Helper.cached_model_names
-            klass
-          rescue 
-            klass = nil
-          end
-          
-          if klass
-            define_method :"#{attribute}" do
-              klass.public_send(:find_by_id, self.meta("#{attribute}_id"))
-            end
-          
-            define_method :"#{attribute}_id" do
-              self.meta("#{attribute}_id")
-            end
-          
-            define_method :"#{attribute}=" do |value|
-              self.meta("#{klass.to_s.underscore}_id", value.nil? ? nil : value.id)
-            end
-        
-            define_method :"#{attribute}_id=" do |value|
-              self.meta("#{klass.to_s.underscore}_id", value)
-            end
-        
-            define_singleton_method :"find_by_#{attribute}_id" do |value|
-              data_type = Helper.get_type value
-              data_type = :int if data_type == :integer
-              self.find_by_id(MetaData.where(meta_model_type: self.arel_table.name, key: "#{attribute}_id", "#{data_type.to_s}_value": value ).first.try(:meta_model_id))
-            end
-          
-          else
-            define_method :"#{attribute}" do
-              self.meta(attribute)
-            end
-          
-            define_method :"#{attribute}=" do |value|
-              self.meta(attribute, value)
-            end
+        # self.around_save    :update_meta_attributes_on_save
 
-            define_singleton_method :"find_by_#{attribute}" do |value|
-              data_type = Helper.get_type value
-              data_type = :int if data_type == :integer
-              self.find_by_id(MetaData.where(meta_model_type: self.arel_table.name, key: attribute, "#{data_type.to_s}_value": value ).first.try(:meta_model_id))
-            end
+        # Stuff under here can me put into it's own module and then included/extended to make it all nice and clean
+        def method_missing method, *args, &block
+          attribute = self.meta_attributes.select { |x| method.match /^#{x}(_id)?=?$/ }.pop
+          super unless attribute
+          object = begin
+                          attribute.to_s.classify.constantize
+                        rescue
+                          nil
+                        end
+          case method
+          when /^#{attribute}$/
+            object ? object.find_by_id(meta(:"#{attribute}_id")) : meta(attribute)
+          when /^#{attribute}_id$/
+            super unless object
+            meta(:"#{attribute}_id")
+          when /^#{attribute}=$/
+            object ? meta(:"#{attribute}_id", args.first.id) : meta(attribute, args.first)
+          when /^#{attribute}_id=$/
+            super unless object
+            meta(attribute, args.first)
+          else
+            super
           end
+        end
+
+        def self.method_missing method, *args, &block
+          attribute = self.meta_attributes.select { |x| method.match /^find_by_#{x}(_id)?$/ }.pop
+          if attribute
+            object = begin
+                            attribute.to_s.classify.constantize
+                          rescue
+                            nil
+                          end
+            if object and method =~ /_id$/
+              self.find_by_id(MetaData.where(meta_model_type: self.class.arel_table.name, key: "#{attribute}_id", "int_value.to_s}_value": value ).first.try(:meta_model_id))
+            elsif !object
+              # TODO: make this work my replacing data_type
+              self.find_by_id(
+                MetaData.where(
+                  meta_model_type: self.class.arel_table.name, 
+                  key: attribute, 
+                  "#{data_type.to_s}_value": value )
+              .first
+              .try(:meta_model_id))
+            else
+              super
+            end
+          else
+            super
+          end
+        end
+
+        def respond_to? method, include_private=false
+          attribute = self.meta_attributes.select { |x| method.match /^#{x}(_id)?=?$/ }.pop
+          if attribute
+            object = begin
+                            attribute.to_s.classify.constantize
+                          rescue
+                            nil
+                          end
+            # if /_id$/ and object then true
+            #
+            # elsif
+            !(object ^ method.match(/_id$/))
+          else
+            super
+          end
+        end
+        # if there's an object it must end in _id
+        # facebook_id
+        # facebook_
+
+        def self.respond_to? method, include_private=false
+          attribute = self.meta_attributes.select { |x| method.match /^find_by_#{x}(_id)?$/ }.pop
+          if attribute
+            object = begin
+                            attribute.to_s.classify.constantize
+                          rescue
+                            nil
+                          end
+            !(object ^ method.match(/_id$/))
+          else
+            super
+          end
+        end
+
+        # Need a self.method_missing for find_by_attribute
         
-        end # ends attributes.each
-      end # ends if attributes.present?
+        # Need a respond_to and self.respond_to for attributes
+      
+      end
     end # ends def has_meta
-  # end # ends module ClassMethods
 
   module InstanceMethods
  
@@ -102,14 +122,14 @@ require_relative 'has_meta/meta_data'
       return false unless self.persisted?
       case val
       when {}
-        meta = MetaData.where(:key => key, :meta_model_type => self.arel_table.name, :meta_model_id => self.id)
+        meta = self.meta_data.where key: key.to_s
         return meta.present? ? meta.last.value : nil
       when nil, ''
-        return MetaData.where(:key => key, :meta_model_type => self.arel_table.name, :meta_model_id => self.id).destroy_all
+        return MetaData.where(:key => key.to_s, :meta_model_type => self.class.arel_table.name, :meta_model_id => self.id).destroy_all
       end
       
       #we are setting a value
-      meta = MetaData.where(:key => key, :meta_model_type => self.arel_table.name, :meta_model_id => self.id).first_or_create
+      meta = MetaData.where(:key => key, :meta_model_type => self.class.arel_table.name, :meta_model_id => self.id).first_or_create
       
       data_type = Helper.get_type val
       if data_type == :integer and !val.is_a? Integer
@@ -122,11 +142,11 @@ require_relative 'has_meta/meta_data'
     end #ends def meta
       
     def list_meta_keys
-        meta = MetaData.where(:meta_model_type => self.arel_table.name, :meta_model_id => self.id).pluck(:key)
+        meta = MetaData.where(:meta_model_type => self.class.arel_table.name, :meta_model_id => self.id).pluck(:key)
     end
     
     def remove_meta(key)
-      MetaData.where(:key => key, :meta_model_type => self.arel_table.name, :meta_model_id => self.id).destroy_all
+      MetaData.where(:key => key, :meta_model_type => self.class.arel_table.name, :meta_model_id => self.id).destroy_all
     end
       
   end #ends module InstanceMethods
@@ -164,13 +184,13 @@ require_relative 'has_meta/meta_data'
     end #ends module Helper
     
     # This needs to live in HasMeta so that it's available to all active record instances
-    define_method :meta_attributes do |inherit=false|
-      begin
-        self.class.meta_attributes(inherit)
-      rescue
-        nil
-      end
-    end
+    # define_method :meta_attributes do |inherit=false|
+    #   begin
+    #     self.class.meta_attributes(inherit)
+    #   rescue
+    #     nil
+    #   end
+    # end
     
     private
     
@@ -189,32 +209,32 @@ require_relative 'has_meta/meta_data'
     
 end #ends module HasMeta
 
-module ActiveModel
-  module AttributeAssignment
-    alias :assign_attributes_original :assign_attributes
-    
-    def filter_meta_attributes(attributes)
-      meta_attributes_to_save = {}
-      self.meta_attributes(true).each do |k|
-        if [k, k.to_s, "#{k.to_s}_id", :"#{k.to_s}_id"].any? {|x| attributes.key? x }
-          if self.respond_to? :"#{k.to_s}_id"
-            meta_key = "#{k.to_s}_id"
-            meta_value = attributes[k].id
-          else
-            meta_key = k
-            meta_value = attributes[k]
-          end
-          meta_attributes_to_save[meta_key] = meta_value
-          attributes.delete(k.to_s) unless attributes.delete(k)
-        end
-      end
-      @meta_attributes_to_save = meta_attributes_to_save if meta_attributes_to_save.present?
-      assign_attributes_original attributes
-    end
-    
-    alias :assign_attributes :filter_meta_attributes
-  end
-end
+ #module ActiveModel
+ #  module AttributeAssignment
+ #    alias :assign_attributes_original :assign_attributes
+ #    
+ #    def filter_meta_attributes(attributes)
+ #      meta_attributes_to_save = {}
+ #      self.meta_attributes(true).each do |k|
+ #        if [k, k.to_s, "#{k.to_s}_id", :"#{k.to_s}_id"].any? {|x| attributes.key? x }
+ #          if self.respond_to? :"#{k.to_s}_id"
+ #            meta_key = "#{k.to_s}_id"
+ #            meta_value = attributes[k].id
+ #          else
+ #            meta_key = k
+ #            meta_value = attributes[k]
+ #          end
+ #          meta_attributes_to_save[meta_key] = meta_value
+ #          attributes.delete(k.to_s) unless attributes.delete(k)
+ #        end
+ #      end
+ #      @meta_attributes_to_save = meta_attributes_to_save if meta_attributes_to_save.present?
+ #      assign_attributes_original attributes
+ #    end
+ #    
+ #    alias :assign_attributes :filter_meta_attributes
+ #  end
+ #end
 
 #ActiveRecord::Base.send(:include, 'HasMeta')
 ActiveSupport.on_load :active_record do
