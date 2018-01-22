@@ -29,23 +29,13 @@ require_relative 'has_meta/meta_data'
         # Stuff under here can me put into it's own module and then included/extended to make it all nice and clean
         def method_missing method, *args, &block
           attribute = self.meta_attributes.select { |x| method.match /^#{x}(_id)?=?$/ }.pop
-          super unless attribute
-          object = begin
-                          attribute.to_s.classify.constantize
-                        rescue
-                          nil
-                        end
-          case method
-          when /^#{attribute}$/
-            object ? object.find_by_id(meta(:"#{attribute}_id")) : meta(attribute)
-          when /^#{attribute}_id$/
-            super unless object
-            meta(:"#{attribute}_id")
-          when /^#{attribute}=$/
-            object ? meta(:"#{attribute}_id", args.first.id) : meta(attribute, args.first)
-          when /^#{attribute}_id=$/
-            super unless object
-            meta(attribute, args.first)
+          if attribute
+            object = self.class.find_object_from attribute            
+            if method =~ /=$/ # setter
+              object ? meta(:"#{attribute}_id", args.first.try(:id) || args.first) : meta(attribute, args.first)
+            else # getter
+              object ? object.find_by_id(meta(:"#{attribute}_id")) : meta(attribute)
+            end
           else
             super
           end
@@ -119,7 +109,8 @@ require_relative 'has_meta/meta_data'
       end
       
       #we are setting a value
-      meta = MetaData.where(:key => key, :meta_model_type => self.class.arel_table.name, :meta_model_id => self.id).first_or_create
+      meta = self.meta_data.where(key: key.to_s).first_or_create
+      # meta = MetaData.where(:key => key, :meta_model_type => self.class.arel_table.name, :meta_model_id => self.id).first_or_create
       
       data_type = Helper.get_type val
       if data_type == :integer and !val.is_a? Integer
