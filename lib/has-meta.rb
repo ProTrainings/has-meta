@@ -112,7 +112,7 @@ require_relative 'has_meta/meta_data'
       meta = self.meta_data.where(key: key.to_s).first_or_create
       # meta = MetaData.where(:key => key, :meta_model_type => self.class.arel_table.name, :meta_model_id => self.id).first_or_create
       
-      data_type = Helper.get_type val
+      data_type = MetaData.resolve_data_type val
       if data_type == :integer and !val.is_a? Integer
         val = val.to_i
       elsif data_type == :decimal and !val.is_a? Float
@@ -132,33 +132,7 @@ require_relative 'has_meta/meta_data'
       
   end #ends module InstanceMethods
     
-    module Helper
-      def self.get_type val
-        if val.kind_of? Integer
-          if val < 2000000000
-            data_type = :integer
-          else
-            # Force data_type to text if the val is greater than the allowed value for an int
-            return :text
-          end
-        end
-        data_type = :decimal if val.kind_of? Float
-        data_type = :date if val.kind_of? Date
-        data_type = :boolean if val.kind_of? TrueClass or val.kind_of? FalseClass
-        data_type = :text if data_type.blank?
-        
-        if data_type == :text
-          #lets do some casting to see if it fits into integer or decimal...
-          if val =~ /\A-{0,1}\d+\Z/
-            data_type = :integer unless val.to_i > 2000000000
-          end
-          if val =~ /\A-{0,1}\d*\.\d+\Z/
-            data_type = :decimal
-          end
-        end
-        data_type
-      end # ends def get_type
-      
+    module Helper      
       def self.cached_model_names
         Rails.cache.fetch("model_names", :expires_in => 1.hour) {ApplicationRecord.descendants}
       end
