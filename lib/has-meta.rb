@@ -1,5 +1,9 @@
 require "has_meta/version"
 module HasMeta
+require 'active_record'
+require 'active_record/version'
+require 'active_support/core_ext/module'
+require 'pry'
 require_relative 'has_meta/meta_data'
   
     def meta_attributes
@@ -71,32 +75,26 @@ require_relative 'has_meta/meta_data'
         def respond_to? method, include_private=false
           attribute = self.meta_attributes.select { |x| method.match /^#{x}(_id)?=?$/ }.pop
           if attribute
-            object = begin
-                            attribute.to_s.classify.constantize
-                          rescue
-                            nil
-                          end
-            return false if object and method.match /[^(_id)]$/
-            true
+            self.class.find_object_from(attribute) ? true : !method.match(/^#{attribute}=?$/).nil?
           else
             super
           end
         end
-        # if there's an object it must end in _id
-        # facebook_id
-        # facebook_
 
         def self.respond_to? method, include_private=false
-          attribute = self.meta_attributes.select { |x| method.match /^find_by_#{x}(_id)?$/ }.pop
+          attribute = self.meta_attributes.select { |x| method.match(/(?<=^find_by_)#{x}(?=$|(?=_id$))/) }.pop
           if attribute
-            object = begin
-                            attribute.to_s.classify.constantize
-                          rescue
-                            nil
-                          end
-            !(object ^ method.match(/_id$/))
+            find_object_from(attribute) ? !method.match(/_id$/).nil? : !method.match(/#{attribute}$/).nil?
           else
             super
+          end
+        end
+                
+        def self.find_object_from attribute
+          begin
+            attribute.to_s.classify.constantize
+          rescue
+            nil
           end
         end
 
