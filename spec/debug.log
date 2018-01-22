@@ -1,0 +1,73 @@
+# Logfile created on 2018-01-19 13:35:54 -0600 by logger.rb/61378
+D, [2018-01-19T13:35:54.258955 #44003] DEBUG -- :   [1m[36m (0.6ms)[0m  [1mCREATE TABLE "meta_data" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "meta_model_type" varchar, "meta_model_id" integer, "key" varchar, "text_value" text, "int_value" integer, "decimal_value" decimal(6,2), "date_value" date) [0m
+D, [2018-01-19T13:35:54.259531 #44003] DEBUG -- :   [1m[35m (0.1ms)[0m  CREATE TABLE "meta_models" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar, "type" varchar) 
+D, [2018-01-19T13:35:54.259894 #44003] DEBUG -- :   [1m[36m (0.1ms)[0m  [1mCREATE TABLE "target_models" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar) [0m
+D, [2018-01-19T13:35:54.261120 #44003] DEBUG -- :   [1m[35m (0.1ms)[0m  CREATE TABLE "schema_migrations" ("version" varchar NOT NULL) 
+D, [2018-01-19T13:35:54.261558 #44003] DEBUG -- :   [1m[36m (0.3ms)[0m  [1mselect sqlite_version(*)[0m
+D, [2018-01-19T13:35:54.262232 #44003] DEBUG -- :   [1m[35m (0.2ms)[0m  CREATE UNIQUE INDEX "unique_schema_migrations" ON "schema_migrations" ("version")
+D, [2018-01-19T13:35:54.262459 #44003] DEBUG -- :   [1m[36m (0.1ms)[0m  [1mSELECT version FROM "schema_migrations"[0m
+D, [2018-01-19T13:35:54.262664 #44003] DEBUG -- :   [1m[35m (0.1ms)[0m  INSERT INTO "schema_migrations" (version) VALUES ('0')
+D, [2018-01-19T13:38:20.054983 #44549] DEBUG -- :   [1m[36m (0.4ms)[0m  [1mCREATE TABLE "meta_data" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "meta_model_type" varchar, "meta_model_id" integer, "key" varchar, "text_value" text, "int_value" integer, "decimal_value" decimal(6,2), "date_value" date) [0m
+D, [2018-01-19T13:38:20.055947 #44549] DEBUG -- :   [1m[35m (0.1ms)[0m  CREATE TABLE "meta_models" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar, "type" varchar) 
+D, [2018-01-19T13:38:20.056452 #44549] DEBUG -- :   [1m[36m (0.1ms)[0m  [1mCREATE TABLE "target_models" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar) [0m
+D, [2018-01-19T13:38:20.058046 #44549] DEBUG -- :   [1m[35m (0.1ms)[0m  CREATE TABLE "schema_migrations" ("version" varchar NOT NULL) 
+D, [2018-01-19T13:38:20.058210 #44549] DEBUG -- :   [1m[36m (0.0ms)[0m  [1mselect sqlite_version(*)[0m
+D, [2018-01-19T13:38:20.058542 #44549] DEBUG -- :   [1m[35m (0.1ms)[0m  CREATE UNIQUE INDEX "unique_schema_migrations" ON "schema_migrations" ("version")
+D, [2018-01-19T13:38:20.058662 #44549] DEBUG -- :   [1m[36m (0.0ms)[0m  [1mSELECT version FROM "schema_migrations"[0m
+D, [2018-01-19T13:38:20.058762 #44549] DEBUG -- :   [1m[35m (0.0ms)[0m  INSERT INTO "schema_migrations" (version) VALUES ('0')
+D, [2018-01-19T13:43:57.036780 #46113] DEBUG -- :   [1m[36m (0.3ms)[0m  [1mCREATE TABLE "meta_data" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "meta_model_type" varchar, "meta_model_id" integer, "key" varchar, "text_value" text, "int_value" integer, "decimal_value" decimal(6,2), "date_value" date) [0m
+D, [2018-01-19T13:43:57.037424 #46113] DEBUG -- :   [1m[35m (0.1ms)[0m  CREATE TABLE "meta_models" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar, "type" varchar) 
+D, [2018-01-19T13:43:57.037788 #46113] DEBUG -- :   [1m[36m (0.1ms)[0m  [1mCREATE TABLE "target_models" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar) [0m
+D, [2018-01-19T13:43:57.039169 #46113] DEBUG -- :   [1m[35m (0.1ms)[0m  CREATE TABLE "schema_migrations" ("version" varchar NOT NULL) 
+D, [2018-01-19T13:43:57.039348 #46113] DEBUG -- :   [1m[36m (0.1ms)[0m  [1mselect sqlite_version(*)[0m
+D, [2018-01-19T13:43:57.039686 #46113] DEBUG -- :   [1m[35m (0.1ms)[0m  CREATE UNIQUE INDEX "unique_schema_migrations" ON "schema_migrations" ("version")
+D, [2018-01-19T13:43:57.039829 #46113] DEBUG -- :   [1m[36m (0.0ms)[0m  [1mSELECT version FROM "schema_migrations"[0m
+D, [2018-01-19T13:43:57.039942 #46113] DEBUG -- :   [1m[35m (0.0ms)[0m  INSERT INTO "schema_migrations" (version) VALUES ('0')
+D, [2018-01-19T13:44:32.175783 #46194] DEBUG -- :   [1m[36m (0.3ms)[0m  [1mCREATE TABLE "meta_data" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "meta_model_type" varchar, "meta_model_id" integer, "key" varchar, "text_value" text, "int_value" integer, "decimal_value" decimal(6,2), "date_value" date) [0m
+D, [2018-01-19T13:44:32.176543 #46194] DEBUG -- :   [1m[35m (0.1ms)[0m  CREATE TABLE "meta_models" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar, "type" varchar) 
+D, [2018-01-19T13:44:32.176957 #46194] DEBUG -- :   [1m[36m (0.1ms)[0m  [1mCREATE TABLE "target_models" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar) [0m
+D, [2018-01-19T13:44:32.179289 #46194] DEBUG -- :   [1m[35m (0.2ms)[0m  CREATE TABLE "schema_migrations" ("version" varchar NOT NULL) 
+D, [2018-01-19T13:44:32.179497 #46194] DEBUG -- :   [1m[36m (0.1ms)[0m  [1mselect sqlite_version(*)[0m
+D, [2018-01-19T13:44:32.179852 #46194] DEBUG -- :   [1m[35m (0.1ms)[0m  CREATE UNIQUE INDEX "unique_schema_migrations" ON "schema_migrations" ("version")
+D, [2018-01-19T13:44:32.180044 #46194] DEBUG -- :   [1m[36m (0.0ms)[0m  [1mSELECT version FROM "schema_migrations"[0m
+D, [2018-01-19T13:44:32.180330 #46194] DEBUG -- :   [1m[35m (0.1ms)[0m  INSERT INTO "schema_migrations" (version) VALUES ('0')
+D, [2018-01-19T13:45:59.430384 #46413] DEBUG -- :   [1m[36m (0.8ms)[0m  [1mCREATE TABLE "meta_data" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "meta_model_type" varchar, "meta_model_id" integer, "key" varchar, "text_value" text, "int_value" integer, "decimal_value" decimal(6,2), "date_value" date) [0m
+D, [2018-01-19T13:45:59.431200 #46413] DEBUG -- :   [1m[35m (0.1ms)[0m  CREATE TABLE "meta_models" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar, "type" varchar) 
+D, [2018-01-19T13:45:59.431629 #46413] DEBUG -- :   [1m[36m (0.1ms)[0m  [1mCREATE TABLE "target_models" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar) [0m
+D, [2018-01-19T13:45:59.433471 #46413] DEBUG -- :   [1m[35m (0.2ms)[0m  CREATE TABLE "schema_migrations" ("version" varchar NOT NULL) 
+D, [2018-01-19T13:45:59.433737 #46413] DEBUG -- :   [1m[36m (0.1ms)[0m  [1mselect sqlite_version(*)[0m
+D, [2018-01-19T13:45:59.434314 #46413] DEBUG -- :   [1m[35m (0.2ms)[0m  CREATE UNIQUE INDEX "unique_schema_migrations" ON "schema_migrations" ("version")
+D, [2018-01-19T13:45:59.434459 #46413] DEBUG -- :   [1m[36m (0.0ms)[0m  [1mSELECT version FROM "schema_migrations"[0m
+D, [2018-01-19T13:45:59.434582 #46413] DEBUG -- :   [1m[35m (0.0ms)[0m  INSERT INTO "schema_migrations" (version) VALUES ('0')
+D, [2018-01-19T13:52:55.299668 #46966] DEBUG -- :   [1m[36m (0.5ms)[0m  [1mCREATE TABLE "meta_data" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "meta_model_type" varchar, "meta_model_id" integer, "key" varchar, "text_value" text, "int_value" integer, "decimal_value" decimal(6,2), "date_value" date) [0m
+D, [2018-01-19T13:52:55.300367 #46966] DEBUG -- :   [1m[35m (0.1ms)[0m  CREATE TABLE "meta_models" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar, "type" varchar) 
+D, [2018-01-19T13:52:55.300701 #46966] DEBUG -- :   [1m[36m (0.1ms)[0m  [1mCREATE TABLE "target_models" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar) [0m
+D, [2018-01-19T13:52:55.301985 #46966] DEBUG -- :   [1m[35m (0.1ms)[0m  CREATE TABLE "schema_migrations" ("version" varchar NOT NULL) 
+D, [2018-01-19T13:52:55.302138 #46966] DEBUG -- :   [1m[36m (0.0ms)[0m  [1mselect sqlite_version(*)[0m
+D, [2018-01-19T13:52:55.302456 #46966] DEBUG -- :   [1m[35m (0.1ms)[0m  CREATE UNIQUE INDEX "unique_schema_migrations" ON "schema_migrations" ("version")
+D, [2018-01-19T13:52:55.302579 #46966] DEBUG -- :   [1m[36m (0.0ms)[0m  [1mSELECT version FROM "schema_migrations"[0m
+D, [2018-01-19T13:52:55.302686 #46966] DEBUG -- :   [1m[35m (0.0ms)[0m  INSERT INTO "schema_migrations" (version) VALUES ('0')
+D, [2018-01-19T13:56:34.044533 #47430] DEBUG -- :   [1m[36m (0.6ms)[0m  [1mCREATE TABLE "meta_data" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "meta_model_type" varchar, "meta_model_id" integer, "key" varchar, "text_value" text, "int_value" integer, "decimal_value" decimal(6,2), "date_value" date) [0m
+D, [2018-01-19T13:56:34.045209 #47430] DEBUG -- :   [1m[35m (0.1ms)[0m  CREATE TABLE "meta_models" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar, "type" varchar) 
+D, [2018-01-19T13:56:34.045539 #47430] DEBUG -- :   [1m[36m (0.1ms)[0m  [1mCREATE TABLE "target_models" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar) [0m
+D, [2018-01-19T13:56:34.046891 #47430] DEBUG -- :   [1m[35m (0.1ms)[0m  CREATE TABLE "schema_migrations" ("version" varchar NOT NULL) 
+D, [2018-01-19T13:56:34.047046 #47430] DEBUG -- :   [1m[36m (0.0ms)[0m  [1mselect sqlite_version(*)[0m
+D, [2018-01-19T13:56:34.047372 #47430] DEBUG -- :   [1m[35m (0.1ms)[0m  CREATE UNIQUE INDEX "unique_schema_migrations" ON "schema_migrations" ("version")
+D, [2018-01-19T13:56:34.047493 #47430] DEBUG -- :   [1m[36m (0.0ms)[0m  [1mSELECT version FROM "schema_migrations"[0m
+D, [2018-01-19T13:56:34.047614 #47430] DEBUG -- :   [1m[35m (0.0ms)[0m  INSERT INTO "schema_migrations" (version) VALUES ('0')
+D, [2018-01-19T14:02:09.244177 #47894] DEBUG -- :   [1m[36m (0.4ms)[0m  [1mCREATE TABLE "meta_data" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "meta_model_type" varchar, "meta_model_id" integer, "key" varchar, "text_value" text, "int_value" integer, "decimal_value" decimal(6,2), "date_value" date) [0m
+D, [2018-01-19T14:02:09.245136 #47894] DEBUG -- :   [1m[35m (0.1ms)[0m  CREATE TABLE "meta_models" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar, "type" varchar) 
+D, [2018-01-19T14:02:09.245672 #47894] DEBUG -- :   [1m[36m (0.1ms)[0m  [1mCREATE TABLE "target_models" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar) [0m
+D, [2018-01-19T14:02:09.247275 #47894] DEBUG -- :   [1m[35m (0.1ms)[0m  CREATE TABLE "schema_migrations" ("version" varchar NOT NULL) 
+D, [2018-01-19T14:02:09.247457 #47894] DEBUG -- :   [1m[36m (0.1ms)[0m  [1mselect sqlite_version(*)[0m
+D, [2018-01-19T14:02:09.247783 #47894] DEBUG -- :   [1m[35m (0.1ms)[0m  CREATE UNIQUE INDEX "unique_schema_migrations" ON "schema_migrations" ("version")
+D, [2018-01-19T14:02:09.247904 #47894] DEBUG -- :   [1m[36m (0.0ms)[0m  [1mSELECT version FROM "schema_migrations"[0m
+D, [2018-01-19T14:02:09.248022 #47894] DEBUG -- :   [1m[35m (0.1ms)[0m  INSERT INTO "schema_migrations" (version) VALUES ('0')
+D, [2018-01-19T14:03:01.340385 #47992] DEBUG -- :   [1m[36m (0.3ms)[0m  [1mCREATE TABLE "meta_data" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "meta_model_type" varchar, "meta_model_id" integer, "key" varchar, "text_value" text, "int_value" integer, "decimal_value" decimal(6,2), "date_value" date) [0m
+D, [2018-01-19T14:03:01.340841 #47992] DEBUG -- :   [1m[35m (0.1ms)[0m  CREATE TABLE "meta_models" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar, "type" varchar) 
+D, [2018-01-19T14:03:01.341205 #47992] DEBUG -- :   [1m[36m (0.1ms)[0m  [1mCREATE TABLE "target_models" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar) [0m
+D, [2018-01-19T14:03:01.342535 #47992] DEBUG -- :   [1m[35m (0.1ms)[0m  CREATE TABLE "schema_migrations" ("version" varchar NOT NULL) 
+D, [2018-01-19T14:03:01.342728 #47992] DEBUG -- :   [1m[36m (0.0ms)[0m  [1mselect sqlite_version(*)[0m
+D, [2018-01-19T14:03:01.343015 #47992] DEBUG -- :   [1m[35m (0.1ms)[0m  CREATE UNIQUE INDEX "unique_schema_migrations" ON "schema_migrations" ("version")
+D, [2018-01-19T14:03:01.343142 #47992] DEBUG -- :   [1m[36m (0.0ms)[0m  [1mSELECT version FROM "schema_migrations"[0m
+D, [2018-01-19T14:03:01.343241 #47992] DEBUG -- :   [1m[35m (0.0ms)[0m  INSERT INTO "schema_migrations" (version) VALUES ('0')

@@ -1,0 +1,2 @@
+class TargetModel < ApplicationRecord
+end

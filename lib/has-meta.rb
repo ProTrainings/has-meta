@@ -59,13 +59,7 @@ require_relative 'has_meta/meta_data'
               self.find_by_id(MetaData.where(meta_model_type: self.class.arel_table.name, key: "#{attribute}_id", "int_value.to_s}_value": value ).first.try(:meta_model_id))
             elsif !object
               # TODO: make this work my replacing data_type
-              self.find_by_id(
-                MetaData.where(
-                  meta_model_type: self.class.arel_table.name, 
-                  key: attribute, 
-                  "#{data_type.to_s}_value": value )
-              .first
-              .try(:meta_model_id))
+              # self.find_by_id(MetaData.where(meta_model_type: self.class.arel_table.name, key: attribute, "#{data_type.to_s}_value": value )).first.try(:meta_model_id)
             else
               super
             end
@@ -82,10 +76,8 @@ require_relative 'has_meta/meta_data'
                           rescue
                             nil
                           end
-            # if /_id$/ and object then true
-            #
-            # elsif
-            !(object ^ method.match(/_id$/))
+            return false if object and method.match /[^(_id)]$/
+            true
           else
             super
           end
