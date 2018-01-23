@@ -26,7 +26,6 @@ module HasMeta
       has_many :meta_data, as: :meta_model, dependent: :destroy, class_name: '::HasMeta::MetaData'
       include HasMeta::InstanceMethods
       include HasMeta::DynamicMethods
-      # self.around_save    :update_meta_attributes_on_save          
     end
   end # ends def has_meta
 
@@ -155,33 +154,6 @@ module HasMeta
     end
         
 end #ends module HasMeta
-
- #module ActiveModel
- #  module AttributeAssignment
- #    alias :assign_attributes_original :assign_attributes
- #    
- #    def filter_meta_attributes(attributes)
- #      meta_attributes_to_save = {}
- #      self.meta_attributes(true).each do |k|
- #        if [k, k.to_s, "#{k.to_s}_id", :"#{k.to_s}_id"].any? {|x| attributes.key? x }
- #          if self.respond_to? :"#{k.to_s}_id"
- #            meta_key = "#{k.to_s}_id"
- #            meta_value = attributes[k].id
- #          else
- #            meta_key = k
- #            meta_value = attributes[k]
- #          end
- #          meta_attributes_to_save[meta_key] = meta_value
- #          attributes.delete(k.to_s) unless attributes.delete(k)
- #        end
- #      end
- #      @meta_attributes_to_save = meta_attributes_to_save if meta_attributes_to_save.present?
- #      assign_attributes_original attributes
- #    end
- #    
- #    alias :assign_attributes :filter_meta_attributes
- #  end
- #end
 
 #ActiveRecord::Base.send(:include, 'HasMeta')
 ActiveSupport.on_load :active_record do
