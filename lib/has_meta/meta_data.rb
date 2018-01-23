@@ -6,7 +6,7 @@ module HasMeta
     def value
 
       return text_value if text_value!=nil
-      return int_value if int_value!=nil
+      return integer_value if integer_value!=nil
       return date_value if date_value!=nil
       return decimal_value if decimal_value!=nil    
           
@@ -20,7 +20,7 @@ module HasMeta
       when :date
         self.date_value = val
       when :integer
-        self.int_value = val
+        self.integer_value = val
       when :decimal
         self.decimal_value = val
       else
@@ -31,7 +31,7 @@ module HasMeta
     
     def clear_values
       self.date_value = nil
-      self.int_value = nil
+      self.integer_value = nil
       self.decimal_value = nil
       self.text_value = nil
     end

@@ -4,7 +4,7 @@ ActiveRecord::Schema.define version: 0 do
     t.integer   :meta_model_id
     t.string    :key
     t.text      :text_value
-    t.integer   :int_value
+    t.integer   :integer_value
     t.decimal   :decimal_value, precision: 6, scale: 2
     t.date      :date_value
   end
