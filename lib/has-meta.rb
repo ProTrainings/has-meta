@@ -144,22 +144,7 @@ module HasMeta
     end
       
   end #ends module InstanceMethods
-    
-    module Helper      
-      def self.cached_model_names
-        Rails.cache.fetch("model_names", :expires_in => 1.hour) {ApplicationRecord.descendants}
-      end
-    end #ends module Helper
-    
-    # This needs to live in HasMeta so that it's available to all active record instances
-    # define_method :meta_attributes do |inherit=false|
-    #   begin
-    #     self.class.meta_attributes(inherit)
-    #   rescue
-    #     nil
-    #   end
-    # end
-    
+        
     private
     
     def update_meta_attributes_on_save
@@ -168,13 +153,7 @@ module HasMeta
         @meta_attributes_to_save = nil
       end
     end
-    
-    def delete_meta_attributes_on_destroy
-      self.list_meta_keys.each do |k|
-        self.remove_meta k 
-      end
-    end
-    
+        
 end #ends module HasMeta
 
  #module ActiveModel
