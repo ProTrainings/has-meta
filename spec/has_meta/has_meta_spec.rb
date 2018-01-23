@@ -4,70 +4,75 @@ RSpec.describe HasMeta do
   end
   
   describe '#respond_to?' do
-    it 'responds to target_model getter' do
-      model = MetaModel.new
-      expect(model.respond_to? :target_model).to be true
-    end
-
-    it 'responds to target_model setter' do
-      model = MetaModel.new
-      expect(model.respond_to? :target_model=).to be true
-    end
-
-    it 'doesn\'t respond to target_models getter' do
+    it 'doesn\'t respond to and unknown getter' do
       model = MetaModel.new
       expect(model.respond_to? :target_models).to be false
     end
+    
+    context 'an attribute representing active record model' do
+      it 'responds to getter' do
+        model = MetaModel.new
+        expect(model.respond_to? :target_model).to be true
+      end
 
-    # Change automatic addtion of "_id" to look at foregin key name
-    it 'responds to target_model_id getter' do
-      model = MetaModel.new
-      expect(model.respond_to? :target_model_id).to be true
+      it 'responds to setter' do
+        model = MetaModel.new
+        expect(model.respond_to? :target_model=).to be true
+      end
+      
+      it 'responds to getter with _id suffix' do
+        model = MetaModel.new
+        expect(model.respond_to? :target_model_id).to be true
+      end
+
+      it 'responds to setter with _id suffix' do
+        model = MetaModel.new
+        expect(model.respond_to? :target_model_id=).to be true
+      end
     end
 
-    it 'responds to target_model_id setter' do
-      model = MetaModel.new
-      expect(model.respond_to? :target_model_id=).to be true
+    context 'a normal attribute with _id suffix' do
+      it 'responds to getter' do
+        model = MetaModel.new
+        expect(model.respond_to? :foo_id).to be true
+      end
+
+      it 'responds to setter' do
+        model = MetaModel.new
+        expect(model.respond_to? :foo_id=).to be true
+      end
+
+      it 'doesn\'t respond to foo setter (like active record model attrs)' do
+        model = MetaModel.new
+        expect(model.respond_to? :foo=).to be false
+      end
+
+      it 'doesn\'t respond to foo getter (like active record model attrs)' do
+        model = MetaModel.new
+        expect(model.respond_to? :foo).to be false
+      end
     end
 
-    it 'responds to foo_id getter' do
-      model = MetaModel.new
-      expect(model.respond_to? :foo_id).to be true
-    end
+    context 'a normal attribute' do
+      it 'responds to setter' do
+        model = MetaModel.new
+        expect(model.respond_to? :foo_bar=).to be true
+      end
 
-    it 'responds to foo_id setter' do
-      model = MetaModel.new
-      expect(model.respond_to? :foo_id=).to be true
-    end
-
-    it 'doesn\'t respond to foo setter' do
-      model = MetaModel.new
-      expect(model.respond_to? :foo=).to be false
-    end
-
-    it 'doesn\'t respond to foo getter' do
-      model = MetaModel.new
-      expect(model.respond_to? :foo).to be false
-    end
-
-    it 'responds to foo_bar setter' do
-      model = MetaModel.new
-      expect(model.respond_to? :foo_bar=).to be true
-    end
-
-    it 'responds to foo_bar getter' do
-      model = MetaModel.new
-      expect(model.respond_to? :foo_bar).to be true
-    end
+      it 'responds to getter' do
+        model = MetaModel.new
+        expect(model.respond_to? :foo_bar).to be true
+      end
   
-    it 'doesn\'t respond to foo_bar_id getter' do
-      model = MetaModel.new
-      expect(model.respond_to? :foo_bar_id).to be false
-    end
+      it 'doesn\'t respond to foo_bar_id getter (like active record model attrs)' do
+        model = MetaModel.new
+        expect(model.respond_to? :foo_bar_id).to be false
+      end
   
-    it 'doesn\'t respond to foo_bar_id setter' do
-      model = MetaModel.new
-      expect(model.respond_to? :foo_bar_id=).to be false
+      it 'doesn\'t respond to foo_bar_id setter (like active record model attrs)' do
+        model = MetaModel.new
+        expect(model.respond_to? :foo_bar_id=).to be false
+      end
     end
   end
   
