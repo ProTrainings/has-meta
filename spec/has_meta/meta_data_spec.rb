@@ -1,40 +1,55 @@
 RSpec.describe HasMeta::MetaData do
   describe '.resolve_data_type' do
-        
+    
     context 'when passed an integer' do
-      it 'coerces to text if too big' do
-        expect(described_class.resolve_data_type 2000000001).to eq(:text)
-      end
       
-      it 'returns :integer' do
-        expect(described_class.resolve_data_type 12345).to eq(:integer)
+      it 'returns correct type and value' do
+        value = 12345
+        expect(described_class.resolve_data_type(value)).to match_array([:integer, value])
+      end
+            
+      context 'integer is too big' do
+        it 'returns correct type and value' do
+          value = 2000000001
+          expect(described_class.resolve_data_type(value)).to match_array([:text, value.to_s])
+        end
       end
     end
     
     context 'when passed a float' do
-      it 'returns :decimal' do
-        expect(described_class.resolve_data_type 12.345).to eq(:decimal)
+      it 'returns correct type and value' do
+        value = 12.345
+        expect(described_class.resolve_data_type(value)).to match_array([:decimal, value])
       end
     end
     
     context 'when passed a date' do
-      it 'returns :date' do
-        expect(described_class.resolve_data_type Date.today).to eq(:date)
+      it 'returns correct type and value' do
+        value = Date.today
+        expect(described_class.resolve_data_type(value)).to match_array([:date, value])
       end
     end
     
     context 'when passed text' do
-      it 'coerces to integer if necessary' do
-        expect(described_class.resolve_data_type '12345').to eq(:integer)
+      it 'returns correct type and value' do
+        value = 'some text'
+        expect(described_class.resolve_data_type(value)).to match_array([:text, value])
       end
       
-      it 'coerces to float if necessary' do
-        expect(described_class.resolve_data_type '12.345').to eq(:decimal)
+      context 'integer string' do
+        it 'returns correct type and value' do
+          value = '12345'
+          expect(described_class.resolve_data_type(value)).to match_array([:integer, value.to_i])
+        end
       end
       
-      it 'return :text' do
-        expect(described_class.resolve_data_type 'some text').to eq(:text)
+      context 'float string' do
+        it 'returns correct type and value' do
+          value = '12.345'
+          expect(described_class.resolve_data_type(value)).to match_array([:decimal, value.to_f])
+        end
       end
+      
     end
     
   end
