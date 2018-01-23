@@ -4,7 +4,7 @@ require 'active_record'
 require 'active_record/version'
 require 'active_support/core_ext/module'
 require 'pry'
-require_relative 'has_meta/meta_data'
+require 'has_meta/meta_data'
   
     def meta_attributes
       nil
@@ -27,6 +27,16 @@ require_relative 'has_meta/meta_data'
         # self.around_save    :update_meta_attributes_on_save
 
         # Stuff under here can me put into it's own module and then included/extended to make it all nice and clean
+        # Instance methods (getters and setters)
+        def respond_to? method, include_private=false
+          attribute = self.meta_attributes.select { |x| method.match /^#{x}(_id)?=?$/ }.pop
+          if attribute
+            self.class.find_object_from(attribute) ? true : !method.match(/^#{attribute}=?$/).nil?
+          else
+            super
+          end
+        end
+        
         def method_missing method, *args, &block
           attribute = self.meta_attributes.select { |x| method.match /^#{x}(_id)?=?$/ }.pop
           if attribute
@@ -41,36 +51,7 @@ require_relative 'has_meta/meta_data'
           end
         end
 
-        def self.method_missing method, *args, &block
-          attribute = self.meta_attributes.select { |x| method.match /^find_by_#{x}(_id)?$/ }.pop
-          if attribute
-            object = begin
-                            attribute.to_s.classify.constantize
-                          rescue
-                            nil
-                          end
-            if object and method =~ /_id$/
-              self.find_by_id(MetaData.where(meta_model_type: self.class.arel_table.name, key: "#{attribute}_id", "int_value.to_s}_value": value ).first.try(:meta_model_id))
-            elsif !object
-              # TODO: make this work my replacing data_type
-              # self.find_by_id(MetaData.where(meta_model_type: self.class.arel_table.name, key: attribute, "#{data_type.to_s}_value": value )).first.try(:meta_model_id)
-            else
-              super
-            end
-          else
-            super
-          end
-        end
-
-        def respond_to? method, include_private=false
-          attribute = self.meta_attributes.select { |x| method.match /^#{x}(_id)?=?$/ }.pop
-          if attribute
-            self.class.find_object_from(attribute) ? true : !method.match(/^#{attribute}=?$/).nil?
-          else
-            super
-          end
-        end
-
+        # Class methods (find_by_attribute getters)
         def self.respond_to? method, include_private=false
           attribute = self.meta_attributes.select { |x| method.match(/(?<=^find_by_)#{x}(?=$|(?=_id$))/) }.pop
           if attribute
@@ -79,7 +60,33 @@ require_relative 'has_meta/meta_data'
             super
           end
         end
-                
+        
+        def self.method_missing method, *args, &block
+          # TODO: test should include condition for multiple values being returned (one-to-many relationship)
+          # TODO: refactor this to not be as cluttery and dense
+          attribute = self.meta_attributes.select { |x| method.match /(?<=^find_by_)#{x}(?=$|(?=_id$))/ }.pop
+          if attribute
+            object = find_object_from(attribute)
+            if object and method =~ /_id$/
+              conditions = {key: "#{attribute}_id", meta_model_type: self}.
+                merge! MetaData.generate_value_hash(args.first)
+                MetaData.where(conditions).map do |x|
+                  self.find_by_id(x.meta_model_id)
+                end
+            elsif !object
+              conditions = {key: "#{attribute}", meta_model_type: self}.
+                merge! MetaData.generate_value_hash(args.first)
+              MetaData.where(conditions).map do |x|
+                self.find_by_id(x.meta_model_id)
+              end
+            else
+              super
+            end
+          else
+            super
+          end
+        end
+       
         def self.find_object_from attribute
           begin
             attribute.to_s.classify.constantize
@@ -87,10 +94,10 @@ require_relative 'has_meta/meta_data'
             nil
           end
         end
-
-        # Need a self.method_missing for find_by_attribute
         
-        # Need a respond_to and self.respond_to for attributes
+        #TODO:
+        # Maybe do something like dynamic_method_for attribute, &block where you just pass what to do and if the attribute is false it goes to super
+        # Or...find a way to just pass the regex or the block to execute to match and let it do all the work
       
       end
     end # ends def has_meta

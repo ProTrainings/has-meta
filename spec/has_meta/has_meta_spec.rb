@@ -3,7 +3,7 @@ RSpec.describe HasMeta do
     expect(HasMeta::VERSION).not_to be nil
   end
   
-  describe '.respond_to?' do
+  describe '#respond_to?' do
     it 'responds to target_model getter' do
       model = MetaModel.new
       expect(model.respond_to? :target_model).to be_truthy
@@ -71,7 +71,7 @@ RSpec.describe HasMeta do
     end
   end
   
-  describe '#respond_to?' do
+  describe '.respond_to?' do
     it 'responds to find_by_target_model_id' do
       expect(MetaModel.respond_to? :find_by_target_model_id).to be true
     end
@@ -93,7 +93,7 @@ RSpec.describe HasMeta do
     end
   end
   
-  describe '.method_missing' do
+  describe '#method_missing' do
     it 'doesn\'t allow an unknown attribute setter' do
       model = MetaModel.create name: "Example"
       expect{model.non_existent_attribute = 0}.to raise_exception(NoMethodError)
@@ -138,8 +138,29 @@ RSpec.describe HasMeta do
     end
   end
   
-  describe '#method_missing' do
-    
+  describe '.method_missing' do
+    context 'find_by_#{attribute} dynamic class method' do
+      it 'doesn\'t allow an unknown attribute getter' do
+        expect{MetaModel.find_by_non_existent_attribute 0}.to raise_exception(NoMethodError)
+      end
+      
+      it 'allows a normal attribute getter' do
+        expect(MetaModel.find_by_foo_bar 0).to be_truthy
+      end
+      
+      it 'allows a normal getter for attribute ending in _id' do
+        expect(MetaModel.find_by_foo_id 0).to be_truthy
+      end
+      
+      context 'attribute representing active record model' do
+        it 'doesn\'t allow a getter for find_by_#{attribute}' do
+          expect{MetaModel.find_by_target_model 0}.to raise_exception(NoMethodError)
+        end
+        it 'allows getter for find_by_#{attribute}_id' do
+          expect(MetaModel.find_by_target_model_id 0).to be_truthy
+        end
+      end
+    end
   end
   
 end
