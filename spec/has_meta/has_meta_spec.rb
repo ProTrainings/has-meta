@@ -3,98 +3,124 @@ RSpec.describe HasMeta do
     expect(HasMeta::VERSION).not_to be nil
   end
   
+  # refactor to use respond_to rspec matcher
   describe '#respond_to?' do
     it 'doesn\'t respond to and unknown getter' do
       model = MetaModel.new
-      expect(model.respond_to? :target_models).to be false
+      expect(model).not_to respond_to(:target_models)
     end
     
     context 'an attribute representing active record model' do
       it 'responds to getter' do
         model = MetaModel.new
-        expect(model.respond_to? :target_model).to be true
+        expect(model).to respond_to(:target_model)
       end
 
       it 'responds to setter' do
         model = MetaModel.new
-        expect(model.respond_to? :target_model=).to be true
+        expect(model).to respond_to(:target_model=)
       end
       
       it 'responds to getter with _id suffix' do
         model = MetaModel.new
-        expect(model.respond_to? :target_model_id).to be true
+        expect(model).to respond_to(:target_model_id)
       end
 
       it 'responds to setter with _id suffix' do
         model = MetaModel.new
-        expect(model.respond_to? :target_model_id=).to be true
+        expect(model).to respond_to(:target_model_id=)
       end
     end
 
     context 'a normal attribute with _id suffix' do
       it 'responds to getter' do
         model = MetaModel.new
-        expect(model.respond_to? :foo_id).to be true
+        expect(model).to respond_to(:foo_id)
       end
 
       it 'responds to setter' do
         model = MetaModel.new
-        expect(model.respond_to? :foo_id=).to be true
+        expect(model).to respond_to(:foo_id=)
       end
 
       it 'doesn\'t respond to foo setter (like active record model attrs)' do
         model = MetaModel.new
-        expect(model.respond_to? :foo=).to be false
+        expect(model).not_to respond_to(:foo=)
       end
 
       it 'doesn\'t respond to foo getter (like active record model attrs)' do
         model = MetaModel.new
-        expect(model.respond_to? :foo).to be false
+        expect(model).not_to respond_to(:foo)
       end
     end
 
     context 'a normal attribute' do
       it 'responds to setter' do
         model = MetaModel.new
-        expect(model.respond_to? :foo_bar=).to be true
+        expect(model).to respond_to(:foo_bar=)
       end
 
       it 'responds to getter' do
         model = MetaModel.new
-        expect(model.respond_to? :foo_bar).to be true
+        expect(model).to respond_to(:foo_bar)
       end
   
       it 'doesn\'t respond to foo_bar_id getter (like active record model attrs)' do
         model = MetaModel.new
-        expect(model.respond_to? :foo_bar_id).to be false
+        expect(model).not_to respond_to(:foo_bar_id)
       end
   
       it 'doesn\'t respond to foo_bar_id setter (like active record model attrs)' do
         model = MetaModel.new
-        expect(model.respond_to? :foo_bar_id=).to be false
+        expect(model).not_to respond_to(:foo_bar_id=)
+      end
+    end
+    
+    describe 'meta attribute inheritance' do
+      
+      context 'a subclass' do
+        subclass = SubMetaModel.new
+        it 'responds to it\'s ancestors\'s meta attribute getter' do
+          expect(subclass).to respond_to(:foo_bar)
+        end
+      
+        it 'responds to it\'s own meta attribute getter' do
+          expect(subclass).to respond_to(:bar)
+        end
+      end
+      
+      context 'a superclass' do
+        superclass = MetaModel.new
+        it 'doesn\'t respond to it\'s subclass\' meta attribute getter' do
+          expect(superclass).not_to respond_to(:bar)
+        end
+      
+        it 'responds to it\'s own meta attribute getter' do
+          expect(superclass).to respond_to(:foo_bar)
+        end
       end
     end
   end
   
   describe '.respond_to?' do
     it 'responds to find_by_target_model_id' do
-      expect(MetaModel.respond_to? :find_by_target_model_id).to be true
+      expect(MetaModel).to respond_to(:find_by_target_model_id)
     end
 
     it 'doesn\'t respond to find_by_target_model' do
-      expect(MetaModel.respond_to? :find_by_target_model).to be false
+      expect(MetaModel).not_to respond_to(:find_by_target_model)
     end
 
     it 'responds to find_by_foo_id' do
-      expect(MetaModel.respond_to? :find_by_foo_id).to be true
+      expect(MetaModel).to respond_to(:find_by_foo_id)
     end
 
     it 'doesn\'t respond to find_by_foo' do
-      expect(MetaModel.respond_to? :find_by_foo).to be false
+      expect(MetaModel).not_to respond_to(:find_by_foo)
     end
 
     it 'responds to find_by_foo_bar' do
-      expect(MetaModel.respond_to? :find_by_foo_bar).to be true
+      expect(MetaModel).to respond_to(:find_by_foo_bar)
     end
   end
   
