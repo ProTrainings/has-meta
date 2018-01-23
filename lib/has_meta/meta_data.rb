@@ -36,7 +36,7 @@ module HasMeta
       self.text_value = nil
     end
     
-    def resolve_data_type value
+    def self.resolve_data_type value
       case value
       when ->(x) {x.kind_of? Integer}
         # TODO: dynamically check for a range error (is this a ruby thing or mysql thing?)
