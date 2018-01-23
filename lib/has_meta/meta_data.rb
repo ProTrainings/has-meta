@@ -57,5 +57,9 @@ module HasMeta
       end      
     end
     
+    def self.generate_value_hash value
+      {"#{resolve_data_type value}_value": value}
+    end
+    
   end
 end

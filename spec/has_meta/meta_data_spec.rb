@@ -38,4 +38,18 @@ RSpec.describe HasMeta::MetaData do
     end
     
   end
+  
+  describe '.generate_value_hash' do
+    it 'returns a hash' do
+      expect(described_class.generate_value_hash('foo').class).to eq(Hash)
+    end
+    
+    it 'contains a key with the data type' do
+      expect(described_class.generate_value_hash('foo').keys.first).to eq(:text_value)
+    end
+    
+    it 'contains the value' do
+      expect(described_class.generate_value_hash('foo').values.first).to eq('foo')
+    end
+  end
 end
