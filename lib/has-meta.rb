@@ -1,10 +1,11 @@
-require "has_meta/version"
-module HasMeta
+require 'has_meta/version'
 require 'active_record'
 require 'active_record/version'
 require 'active_support/core_ext/module'
 require 'pry'
 require 'has_meta/meta_data'
+
+module HasMeta
   
     def meta_attributes
       nil
@@ -44,12 +45,12 @@ require 'has_meta/meta_data'
           if attribute
             object = self.class.find_object_from attribute            
             if method =~ /=$/ # setter
-              object ? meta(:"#{attribute}_id", args.first.try(:id) || args.first) : meta(attribute, args.first)
+              object ? meta_set!(:"#{attribute}_id", args.first.try(:id) || args.first) : meta_set!(attribute, args.first)
             else # getter
               if object
-                method =~ /_id$/ ? meta(:"#{attribute}_id") : object.find_by_id(meta(:"#{attribute}_id"))
-              else  
-                meta(attribute)
+                method =~ /_id$/ ? meta_get(:"#{attribute}_id") : object.find_by_id(meta_get(:"#{attribute}_id"))
+              else
+                meta_get(attribute)
               end
             end
           else
@@ -110,30 +111,25 @@ require 'has_meta/meta_data'
 
   module InstanceMethods
  
-    # data_type [Text, Integer, Decimal, Date]
-    def meta(key, val={})
-      return false unless self.persisted?
-      case val
-      when {}
-        meta = self.meta_data.where key: key.to_s
-        return meta.present? ? meta.last.value : nil
-      when nil, ''
-        return MetaData.where(:key => key.to_s, :meta_model_type => self.class.arel_table.name, :meta_model_id => self.id).destroy_all
-      end
+    def meta_get key
+      self.meta_data.where(key: key.to_s).first.value
+    end
+    
+    def meta_set key, value
+      return meta_destroy key if value.nil? or value == ''
       
-      #we are setting a value
       meta = self.meta_data.where(key: key.to_s).first_or_create
-      # meta = MetaData.where(:key => key, :meta_model_type => self.class.arel_table.name, :meta_model_id => self.id).first_or_create
+      meta.value = value
+      meta
+    end
+    
+    def meta_set! key, value
+      meta_set(key, value).save
+    end
       
-      data_type = MetaData.resolve_data_type val
-      if data_type == :integer and !val.is_a? Integer
-        val = val.to_i
-      elsif data_type == :decimal and !val.is_a? Float
-        val = val.to_f
-      end
-      
-      meta.save_value!(data_type, val)
-    end #ends def meta
+    def meta_destroy key
+      self.meta_data.where(key: key).destroy_all
+    end
       
     def list_meta_keys
         meta = MetaData.where(:meta_model_type => self.class.arel_table.name, :meta_model_id => self.id).pluck(:key)

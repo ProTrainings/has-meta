@@ -3,47 +3,32 @@ module HasMeta
     
     belongs_to :meta_model, polymorphic: true
 
-    def value
+    attr_accessor :value
+    attr_reader :data_type
 
-      return text_value if text_value!=nil
-      return integer_value if integer_value!=nil
-      return date_value if date_value!=nil
-      return decimal_value if decimal_value!=nil    
-          
-      return nil
+    def value
+      @value ||= value_attributes.compact.values.pop
     end
     
-    def save_value!(data_type, val)
-      clear_values
-      
-      case data_type
-      when :date
-        self.date_value = val
-      when :integer
-        self.integer_value = val
-      when :decimal
-        self.decimal_value = val
-      else
-        self.text_value = val
-      end
-      self.save
+    def value= value
+      @data_type, @value = resolve_data_type! value
+      set_attribute
+    end
+        
+    def self.generate_value_hash value
+      data_type, value = resolve_data_type! value
+      {"#{data_type}_value": value}
     end
     
-    def clear_values
-      self.date_value = nil
-      self.integer_value = nil
-      self.decimal_value = nil
-      self.text_value = nil
-    end
+    private
     
-    def self.resolve_data_type value
+    def self.resolve_data_type! value
       case value
       when ->(x) {x.kind_of? Integer}
         # TODO: dynamically check for a range error (is this a ruby thing or mysql thing?)
         if value < 2000000000
           return :integer, value
         else
-          # Force data_type to text if the value is greater than the allowed valueue for an int
           return :text, value.to_s
         end
       when ->(x) {x.kind_of? Float}
@@ -57,13 +42,25 @@ module HasMeta
       end            
     end
     
-    def resolve_data_type value
-      self.class.resolve_data_type value
+    def resolve_data_type! value
+      self.class.resolve_data_type! value
     end
     
-    def self.generate_value_hash value
-      data_type, value = resolve_data_type value
-      {"#{data_type}_value": value}
+    def value_attributes 
+      self.attributes.select do |k, _|
+        k =~ /_value/
+      end
+    end
+    
+    def reset_values
+      value_attributes.keys.each do |attribute|
+        self[attribute] = nil
+      end
+    end
+    
+    def set_attribute
+      reset_values
+      self[:"#{@data_type}_value"] = @value
     end
     
   end

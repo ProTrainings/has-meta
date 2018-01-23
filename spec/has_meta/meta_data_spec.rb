@@ -1,17 +1,17 @@
 RSpec.describe HasMeta::MetaData do
-  describe '.resolve_data_type' do
+  describe '.resolve_data_type!' do
     
     context 'when passed an integer' do
       
       it 'returns correct type and value' do
         value = 12345
-        expect(described_class.resolve_data_type(value)).to match_array([:integer, value])
+        expect(described_class.resolve_data_type!(value)).to match_array([:integer, value])
       end
             
       context 'integer is too big' do
         it 'returns correct type and value' do
           value = 2000000001
-          expect(described_class.resolve_data_type(value)).to match_array([:text, value.to_s])
+          expect(described_class.resolve_data_type!(value)).to match_array([:text, value.to_s])
         end
       end
     end
@@ -19,34 +19,34 @@ RSpec.describe HasMeta::MetaData do
     context 'when passed a float' do
       it 'returns correct type and value' do
         value = 12.345
-        expect(described_class.resolve_data_type(value)).to match_array([:decimal, value])
+        expect(described_class.resolve_data_type!(value)).to match_array([:decimal, value])
       end
     end
     
     context 'when passed a date' do
       it 'returns correct type and value' do
         value = Date.today
-        expect(described_class.resolve_data_type(value)).to match_array([:date, value])
+        expect(described_class.resolve_data_type!(value)).to match_array([:date, value])
       end
     end
     
     context 'when passed text' do
       it 'returns correct type and value' do
         value = 'some text'
-        expect(described_class.resolve_data_type(value)).to match_array([:text, value])
+        expect(described_class.resolve_data_type!(value)).to match_array([:text, value])
       end
       
       context 'integer string' do
         it 'returns correct type and value' do
           value = '12345'
-          expect(described_class.resolve_data_type(value)).to match_array([:integer, value.to_i])
+          expect(described_class.resolve_data_type!(value)).to match_array([:integer, value.to_i])
         end
       end
       
       context 'float string' do
         it 'returns correct type and value' do
           value = '12.345'
-          expect(described_class.resolve_data_type(value)).to match_array([:decimal, value.to_f])
+          expect(described_class.resolve_data_type!(value)).to match_array([:decimal, value.to_f])
         end
       end
       
@@ -66,5 +66,18 @@ RSpec.describe HasMeta::MetaData do
     it 'contains the value' do
       expect(described_class.generate_value_hash('foo').values.first).to eq('foo')
     end
+  end
+  
+  describe '#set_attribute' do
+    it 'sets the attribute to the given value' do
+      value = 'some text'
+      instance = described_class.new value: value
+      instance.send(:set_attribute)
+      expect(instance.text_value).to eq(value)
+    end
+    # it 'example' do
+    #   binding.pry
+    # end
+    
   end
 end
