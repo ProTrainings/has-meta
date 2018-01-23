@@ -168,4 +168,194 @@ RSpec.describe HasMeta do
     end
   end
   
+  # These seem to be more of integration tests
+  describe 'dynamic getters and setters' do
+    
+    context 'normal attribute \'foo_bar\'' do
+
+      instance = MetaModel.create name: "Example"
+      value = 'test string'
+      
+      describe 'setter' do
+        it 'increases count by 1' do
+          expect{instance.foo_bar = value}.to change{HasMeta::MetaData.all.count}.by(1)
+        end
+          
+        it 'creates associated record' do
+          expect(HasMeta::MetaData.where key: :foo_bar, meta_model_type: instance.class, meta_model_id: instance.id ).not_to be_empty
+        end
+      end
+      
+      describe 'getter' do
+        it 'returns correct value' do
+          expect(instance.foo_bar).to eq(value)
+        end
+      end
+      
+      describe 're-setting value' do
+        new_value = 'new test string'
+        it 'doesn\'t create a new record' do
+          expect{instance.foo_bar = new_value}.not_to change{HasMeta::MetaData.all.count}
+        end
+        
+        it 'changes value' do
+          expect(instance.foo_bar).to eq(new_value)
+        end
+      end
+      
+    end
+    
+    context 'normal attribute with _id suffix' do
+      
+      instance = MetaModel.create name: "Example"
+      value = 'another test string'
+      
+      describe 'setter' do
+        it 'increases count by 1' do
+          expect{instance.foo_id = value}.to change{HasMeta::MetaData.all.count}.by(1)
+        end
+          
+        it 'creates associated record' do
+          expect(HasMeta::MetaData.where key: :foo_id, meta_model_type: instance.class, meta_model_id: instance.id ).not_to be_empty
+        end
+      end
+      
+      describe 'getter' do
+        it 'returns correct value' do
+          expect(instance.foo_id).to eq(value)
+        end
+      end
+      
+      describe 're-setting value' do
+        
+        new_value = 'another new test string'
+        
+        it 'doesn\'t create a new record' do
+          expect{instance.foo_id = new_value}.not_to change{HasMeta::MetaData.all.count}
+        end
+        
+        it 'changes value' do
+          expect(instance.foo_id).to eq(new_value)
+        end
+      end
+      
+    end
+    
+    context 'attribute representing active record model' do
+    
+      instance = MetaModel.create name: "Example"
+      target_instance = TargetModel.create name: "Example"
+      
+      context 'without _id suffix' do
+        describe 'setter' do
+          it 'increases count by 1' do
+            expect{instance.target_model = target_instance}.to change{HasMeta::MetaData.all.count}.by(1)
+          end
+          
+          it 'creates associated record under key :target_model_id' do
+            expect(HasMeta::MetaData.where key: :target_model_id, meta_model_type: instance.class, meta_model_id: instance.id ).not_to be_empty
+          end
+        end
+      
+        describe 'getter' do
+          it 'returns correct value' do
+            expect(instance.target_model).to eq(target_instance)
+          end
+        end        
+      end
+
+      new_target_instance = TargetModel.create name: "Example"
+      
+      describe 'setter with _id suffix' do
+        
+        it 'doesn\'t create a new record' do
+          expect{instance.target_model_id = new_target_instance.id}.not_to change{HasMeta::MetaData.all.count}
+        end
+        
+      end
+      
+      describe 'getter with _id suffix' do
+        it 'doesn\'t return old value' do
+          expect(instance.target_model).not_to eq(target_instance)
+        end
+        
+        it 'returns the new value' do
+          expect(instance.target_model).to eq(new_target_instance)
+        end
+        
+        it 'returns an id integer' do
+          expect(instance.target_model_id).to be_a(Integer)
+        end
+        
+        it 'returns the correct value' do
+          expect(instance.target_model_id).to eq(new_target_instance.id)
+        end
+        
+      end
+    
+    end
+
+  end
+  
+  describe 'dynamic class method getters (find_by_x)' do
+
+    context 'normal attribute \'foo_bar\'' do
+      instance = MetaModel.create name: "Example"
+      value = 1
+      instance.foo_bar = value
+      it 'returns an array' do
+        expect(MetaModel.find_by_foo_bar value).to be_a(Array)
+      end
+      
+      it 'array contains MetaModel instance' do
+        expect(MetaModel.find_by_foo_bar value).to contain_exactly(instance)
+      end
+      
+      it 'returns multiple matches' do
+        another_instance = MetaModel.create name: "Example"
+        another_instance.foo_bar = value
+        expect(MetaModel.find_by_foo_bar value).to contain_exactly(instance, another_instance)
+      end
+    end
+    
+    context 'normal attribute with _id suffix' do
+      instance = MetaModel.create name: "Example"
+      value = 1
+      instance.foo_id = value
+      it 'returns an array' do
+        expect(MetaModel.find_by_foo_id value).to be_a(Array)
+      end
+      
+      it 'array contains MetaModel instance' do
+        expect(MetaModel.find_by_foo_id value).to contain_exactly(instance)
+      end
+      
+      it 'returns multiple matches' do
+        another_instance = MetaModel.create name: "Example"
+        another_instance.foo_id = value
+        expect(MetaModel.find_by_foo_id value).to contain_exactly(instance, another_instance)
+      end
+    end
+
+    context 'attribute representing an active record model' do
+      instance = MetaModel.create name: "Example"
+      target_instance = TargetModel.create name: "Example"
+      instance.target_model = target_instance
+      it 'returns an array' do
+        expect(MetaModel.find_by_target_model_id target_instance.id).to be_a(Array)
+      end
+      
+      it 'array contains MetaModel instance' do
+        expect(MetaModel.find_by_target_model_id target_instance.id).to contain_exactly(instance)
+      end
+      
+      it 'returns multiple matches' do
+        another_instance = MetaModel.create name: "Example"
+        another_instance.target_model = target_instance
+        expect(MetaModel.find_by_target_model_id target_instance.id).to contain_exactly(instance, another_instance)
+      end
+    end
+ 
+  end
+  
 end
