@@ -153,24 +153,33 @@ module HasMeta
     module ClassMethods
       def with_meta args={}
         
+        # Establish the tables and aliases
         meta_model = self.arel_table
         meta_data = MetaData.arel_table
+        alias_array = args.keys.map { |key| meta_data.alias("#{key}_join") }            
         
-        query = meta_model
-          .project(meta_model[Arel.star])
-          .join(meta_data, Arel::Nodes::InnerJoin)
-          .on(meta_data[:meta_model_type].eq(self).and(meta_data[:meta_model_id].eq(meta_model[:id])))
-        
-        query = args
-          .map { |k, v|
-            {k => MetaData.generate_value_hash(v)} }
-          .reduce(query) { |q, x|
-            key, value_hash = *x.first
-            value_column, value = *value_hash.first
-            q = q.where(meta_data[:key].eq(key).and(meta_data[value_column].eq(value))) }
+        # Start the query with a SELECT statement
+        # query = meta_model
+        #   .project(meta_model[Arel.star])
 
-        self.find_by_sql query
+        # Add a JOIN for each unique key we'll search against
+        join_statement = alias_array.reduce(meta_model) do |q, meta_alias| 
+          q.join(meta_alias, Arel::Nodes::InnerJoin)
+            .on(meta_alias[:meta_model_type].eq(self)
+            .and(meta_alias[:meta_model_id].eq(meta_model[:id])))
+        end        
         
+        where_statement = args
+          .each.with_index.map { |(key, values), i|
+            meta_alias = alias_array[i]
+            
+            [MetaData.generate_value_hash(*values)].flatten.map { |x| k, v = *x.first; meta_alias[k].in(v) }
+              .reduce { |acc, x| acc.or(x) } }.reduce {|acc, x| acc.and(x) }
+
+        self
+          .joins(join_statement.join_sources)
+          .where(where_statement)
+
       end
     end
   end

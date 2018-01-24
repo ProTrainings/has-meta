@@ -384,18 +384,29 @@ RSpec.describe HasMeta do
   end
   
   describe '.with_meta' do
+    it 'returns an active record relation' do
+      expect(MetaModel.with_meta foo_bar: 'example').to be_a(ActiveRecord::Relation)
+    end
+    
     it 'returns items specified' do
       a = MetaModel.create
-      a.foo_bar = 5
       b = MetaModel.create
+      a.foo_bar = 5
       b.foo_bar = 5
-
+      
       expect(MetaModel.with_meta foo_bar: 5).to contain_exactly(a, b)
     end
     
-    it 'accepts multiple arguments'
+    it 'accepts multiple arguments' do
+      a = MetaModel.create
+      b = MetaModel.create
+      a.update_attributes foo_bar: 'some text', foo_id: 5
+      b.update_attributes foo_bar: 'some other text', foo_id: 5
+      
+      expect(MetaModel.with_meta foo_bar: ['some text', 'some other text', 9], foo_id: 5).to contain_exactly(a, b)
+    end
     
-    it 'can be chained'
+    
   end
   
 end
