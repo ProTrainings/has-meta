@@ -26,6 +26,7 @@ module HasMeta
       has_many :meta_data, as: :meta_model, dependent: :destroy, class_name: '::HasMeta::MetaData'
       include HasMeta::InstanceMethods
       include HasMeta::DynamicMethods
+      include HasMeta::QueryMethods
     end
   end # ends def has_meta
 
@@ -143,6 +144,36 @@ module HasMeta
     end
       
   end #ends module InstanceMethods
+  
+  module QueryMethods
+    def self.included base
+      base.extend ClassMethods
+    end
+    
+    module ClassMethods
+      def with_meta args={}
+        
+        meta_model = self.arel_table
+        meta_data = MetaData.arel_table
+        
+        query = meta_model
+          .project(meta_model[Arel.star])
+          .join(meta_data, Arel::Nodes::InnerJoin)
+          .on(meta_data[:meta_model_type].eq(self).and(meta_data[:meta_model_id].eq(meta_model[:id])))
+        
+        query = args
+          .map { |k, v|
+            {k => MetaData.generate_value_hash(v)} }
+          .reduce(query) { |q, x|
+            key, value_hash = *x.first
+            value_column, value = *value_hash.first
+            q = q.where(meta_data[:key].eq(key).and(meta_data[value_column].eq(value))) }
+
+        self.find_by_sql query
+        
+      end
+    end
+  end
         
     private
     

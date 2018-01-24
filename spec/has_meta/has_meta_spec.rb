@@ -3,7 +3,6 @@ RSpec.describe HasMeta do
     expect(HasMeta::VERSION).not_to be nil
   end
   
-  # refactor to use respond_to rspec matcher
   describe '#respond_to?' do
     it 'doesn\'t respond to and unknown getter' do
       model = MetaModel.new
@@ -382,6 +381,21 @@ RSpec.describe HasMeta do
       end
     end
  
+  end
+  
+  describe '.with_meta' do
+    it 'returns items specified' do
+      a = MetaModel.create
+      a.foo_bar = 5
+      b = MetaModel.create
+      b.foo_bar = 5
+
+      expect(MetaModel.with_meta foo_bar: 5).to contain_exactly(a, b)
+    end
+    
+    it 'accepts multiple arguments'
+    
+    it 'can be chained'
   end
   
 end
