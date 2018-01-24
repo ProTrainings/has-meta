@@ -15,13 +15,33 @@ module HasMeta
       set_attribute
     end
         
-    def self.generate_value_hash value
-      data_type, value = resolve_data_type! value
-      {"#{data_type}_value": value}
+    def self.generate_value_hash *values
+      # values = 'some text'
+      # values = ['some text', 'some other text']
+      # values = ['some text', 'some other text', 9]
+      if values.size == 1
+        # {text_value: 'some text'}
+        value_hash_for values.pop
+      else
+        # ['some text', 'some other text', 9]
+        # [{text_value: 'some text'}, {text_value: 'some other text'}, {integer_value: 9}]
+        # {:text_value=>[{:text_value=>"some text"}, {:text_value=>"some other text"}], :integer_value=>[{:integer_value=>9}]}
+        # values.map { |value| value_hash_for value }.group_by { |x| x.keys.first }.map {|k, v| {k => v.map {|x| x.values.first}}}
+        values
+          .map { |value| value_hash_for value }
+          .group_by { |x| x.keys.first }
+          .map {|k, v| {k => v.map {|x| x.values.first}}}
+        
+      end
     end
     
     private
     
+    def self.value_hash_for value
+      data_type, value = resolve_data_type! value
+      {"#{data_type}_value": value}
+    end
+        
     def self.resolve_data_type! value
       case value
       when ->(x) {x.kind_of? Integer}
