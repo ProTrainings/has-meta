@@ -54,7 +54,6 @@ RSpec.describe HasMeta::MetaData do
     
   end
   
-  # This needs some updated tests
   describe '.generate_value_hash' do
     it 'returns a hash' do
       expect(described_class.generate_value_hash('foo').class).to eq(Hash)
