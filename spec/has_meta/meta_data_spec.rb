@@ -54,17 +54,59 @@ RSpec.describe HasMeta::MetaData do
     
   end
   
+  # This needs some updated tests
   describe '.generate_value_hash' do
     it 'returns a hash' do
       expect(described_class.generate_value_hash('foo').class).to eq(Hash)
     end
     
-    it 'contains a key with the data type' do
-      expect(described_class.generate_value_hash('foo').keys.first).to eq(:text_value)
+    context 'when passed a single value' do
+      it 'contains a key with the data type' do
+        expect(described_class.generate_value_hash('foo').keys.first).to eq(:text_value)
+      end
+    
+      it 'contains the value' do
+        expect(described_class.generate_value_hash('foo').values.first).to eq('foo')
+      end
     end
     
-    it 'contains the value' do
-      expect(described_class.generate_value_hash('foo').values.first).to eq('foo')
+    context 'when passed multiple values of same type' do
+      it 'contains one key for data type' do
+        expect(described_class.generate_value_hash('foo', 'bar').keys.count).to eq(1)
+      end
+      
+      it 'contains an array of values for data type' do
+        expect(described_class.generate_value_hash('foo', 'bar').values.first).to be_a(Array)
+      end
+      
+      it 'contains correct values in array' do
+        expect(described_class.generate_value_hash('foo', 'bar').values.first).to contain_exactly('foo', 'bar')
+      end
+    end
+    
+    context 'when passed multiple values of varying types' do
+      it 'contains one key for each data type' do
+        expect(described_class.generate_value_hash('foo', 'bar', 5).keys).to contain_exactly(:text_value, :integer_value)
+      end
+      
+      it 'contains correct values for data type :text' do
+        expect(described_class.generate_value_hash('foo', 'bar', 5)[:text_value]).to contain_exactly('foo', 'bar')
+      end
+      
+      it 'contains correct values for data type :integer' do
+        expect(described_class.generate_value_hash('foo', 'bar', 5)[:integer_value]).to eq(5)        
+      end
+    end
+    
+    context 'when passed an active record object' do
+      target_model = TargetModel.create
+      it 'returns data type :integer' do
+        expect(described_class.generate_value_hash(target_model).keys).to contain_exactly(:integer_value)
+      end
+      it 'returns object\'s id' do
+        expect(described_class.generate_value_hash(target_model)[:integer_value]).to eq(target_model.id)
+        
+      end
     end
   end
   
@@ -75,9 +117,6 @@ RSpec.describe HasMeta::MetaData do
       instance.send(:set_attribute)
       expect(instance.text_value).to eq(value)
     end
-    # it 'example' do
-    #   binding.pry
-    # end
     
   end
 end

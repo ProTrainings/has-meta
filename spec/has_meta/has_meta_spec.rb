@@ -397,16 +397,77 @@ RSpec.describe HasMeta do
       expect(MetaModel.with_meta foo_bar: 5).to contain_exactly(a, b)
     end
     
+    it 'doesn\'t return equal values from other keys' do
+      a = MetaModel.create
+      b = MetaModel.create
+      a.foo_bar = 6
+      b.foo_id = 6
+      
+      expect(MetaModel.with_meta foo_bar: 6).to contain_exactly(a)
+    end
+    
     it 'accepts multiple arguments' do
       a = MetaModel.create
       b = MetaModel.create
       a.update_attributes foo_bar: 'some text', foo_id: 5
       b.update_attributes foo_bar: 'some other text', foo_id: 5
-      
+
       expect(MetaModel.with_meta foo_bar: ['some text', 'some other text', 9], foo_id: 5).to contain_exactly(a, b)
     end
     
+    context 'when passed active record object' do
+      
+      it 'returns items specified' do
+        a = MetaModel.create
+        c = TargetModel.create
+        a.target_model = c
+        expect(MetaModel.with_meta target_model: c).to contain_exactly(a)
+        
+      end
+    end
     
+    it 'accepts :any option' do
+      a = MetaModel.create
+      b = MetaModel.create
+      a.update_attributes foo_bar: 'pick me'
+      b.update_attributes foo_id: 7
+      
+      expect(MetaModel.with_meta({foo_bar: 'pick me', foo_id: 7}, any: true)).to contain_exactly(a,b)
+    end
+    
+  end
+  
+  describe '.excluding_meta' do
+    it 'returns and active record relation' do 
+      expect(MetaModel.excluding_meta foo_bar: 'example').to be_a(ActiveRecord::Relation)
+    end
+    
+    context 'when passed an object' do
+      it 'doesn\'t return items specified' do
+        a = MetaModel.create
+        b = MetaModel.create
+        c = TargetModel.create
+        a.target_model = c
+        b.target_model = c
+      
+        expect(MetaModel.excluding_meta target_model: c).not_to include(a, b)
+      end
+    
+    end
+    
+    context 'when passed an attribute name' do
+      it 'doesn\'t return items specified' do
+        a = MetaModel.create
+        b = MetaModel.create
+        c = TargetModel.create
+        a.target_model = c
+        b.target_model = c
+      
+        expect(MetaModel.excluding_meta target_model_id: c.id).not_to include(a, b)
+      end
+      
+    end
+  
   end
   
 end

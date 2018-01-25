@@ -30,8 +30,11 @@ module HasMeta
         values
           .map { |value| value_hash_for value }
           .group_by { |x| x.keys.first }
-          .map {|k, v| {k => v.map {|x| x.values.first}}}
-        
+          .reduce({}) do |acc, hash|
+            key, value = *hash 
+            acc.merge({key => value.size == 1 ? value.first.values.first : value.map {|x| x.values.first}})
+          end
+          # .map {|k, v| {k => v.map {|x| x.values.first}}}
       end
     end
     
@@ -55,6 +58,8 @@ module HasMeta
         return :decimal, value
       when ->(x) {x.kind_of? Date}
         return :date, value
+      when ->(x) {x.respond_to? :id}
+        return :integer, value.id
       else
         return :integer, value.to_i if value =~ /^-?\d+$/
         return :decimal, value.to_f if value =~ /^-?\d*\.\d+$/
