@@ -145,43 +145,108 @@ module HasMeta
       
   end #ends module InstanceMethods
   
+  module MetaQueries
+    class WithMeta
+      def initialize meta_model, meta_data, conditions, options={}
+        @meta_model = meta_model
+        @meta_data  = meta_data
+        @conditions = conditions
+        @options    = options
+      end
+      
+      def build
+        @meta_model
+          .joins(for_each_meta_key)
+          .where(conditions_for_keys)
+      end
+      
+      private
+      
+      attr_reader :meta_model, :meta_data, :conditions, :options
+      
+      def meta_model_arel_table
+        @meta_model_arel_table ||= @meta_model.arel_table
+      end
+      
+      def meta_data_arel_table
+        @meta_data_arel_table ||= @meta_data.arel_table
+      end
+      
+      def meta_data_aliases
+        @meta_data_aliases = @conditions.keys
+          .map.with_index do |key, i|
+            meta_data_arel_table.alias("#{key}_join")
+          end
+      end
+      
+      def for_each_meta_key
+        meta_data_aliases.reduce(meta_model_arel_table) { |acc, meta_data_alias|
+          acc
+            .join(meta_data_alias, Arel::Nodes::InnerJoin)
+            .on(on_conditions meta_data_alias)
+        }.join_sources
+      end
+      
+      def on_conditions table_alias
+        type_condition = table_alias[:meta_model_type].eq(meta_model)
+        id_condition = table_alias[:meta_model_id].eq(meta_model_arel_table[:id])
+        
+        type_condition.and(id_condition)
+      end
+      
+      def conditions_for_keys 
+        @conditions.values.map.with_index do |values, i|
+            meta_data_alias = meta_data_aliases[i]
+            conditions_for_key(meta_data_alias, values).reduce { |acc, x| acc.or(x) } 
+        end
+        .reduce { |acc, x| acc.and(x) } 
+      end
+      
+      def conditions_for_key meta_data_alias, values
+        [MetaData.generate_value_hash(*values)].flatten
+          .map { |value_hash| 
+            column, value_ary = *value_hash.first 
+            meta_data_alias[column].in(value_ary) }
+      end
+    end
+  end
+  
   module QueryMethods
     def self.included base
       base.extend ClassMethods
     end
     
     module ClassMethods
+      
       def with_meta args={}
-        
+        HasMeta::MetaQueries::WithMeta.new(self, MetaData, args).build
         # Establish the tables and aliases
-        meta_model = self.arel_table
-        meta_data = MetaData.arel_table
-        alias_array = args.keys.map { |key| meta_data.alias("#{key}_join") }            
+        # meta_model = self.arel_table
+        # meta_data = MetaData.arel_table
         
-        # Start the query with a SELECT statement
-        # query = meta_model
-        #   .project(meta_model[Arel.star])
-
-        # Add a JOIN for each unique key we'll search against
-        join_statement = alias_array.reduce(meta_model) do |q, meta_alias| 
-          q.join(meta_alias, Arel::Nodes::InnerJoin)
-            .on(meta_alias[:meta_model_type].eq(self)
-            .and(meta_alias[:meta_model_id].eq(meta_model[:id])))
-        end        
-        
-        where_statement = args
-          .each.with_index.map { |(key, values), i|
-            meta_alias = alias_array[i]
-            
-            [MetaData.generate_value_hash(*values)].flatten.map { |x| k, v = *x.first; meta_alias[k].in(v) }
-              .reduce { |acc, x| acc.or(x) } }.reduce {|acc, x| acc.and(x) }
-
-        self
-          .joins(join_statement.join_sources)
-          .where(where_statement)
+        # binding.pry
+        # where_statement = args.values
+        #   .map.with_index { |values, i|
+        #     meta_alias = alias_array[i]
+        #     [MetaData.generate_value_hash(*values)]
+        #       .flatten.map { |x|
+        #         k, v = *x.first
+        #         meta_alias[k].in(v) }
+        #       .reduce { |acc, x| acc.or(x) } }
+        #   .reduce { |acc, x| acc.and(x) }
+        #
+        # self
+        #   .joins(join_statement.join_sources)
+        #   .where(where_statement)
+        #
+        # self
+        #   .joins(each_meta_key)
+        #   .where(conditions_for_keys)
 
       end
-    end
+      
+    end  
+      
   end
         
     private
