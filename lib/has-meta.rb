@@ -1,15 +1,26 @@
-require 'has_meta/version'
-require 'active_record'
-require 'active_record/version'
-require 'active_support/core_ext/module'
+# require 'active_record'
+# require 'active_record/version'
+# require 'active_support/core_ext/module'
+
 require 'pry'
-require 'has_meta/meta_data'
-require 'has_meta/meta_query'
-require 'has_meta/query_methods'
-require 'has_meta/dynamic_methods'
-require 'has_meta/instance_methods'
+
+begin
+  require 'rails/engine'
+  require 'has_meta/engine'
+rescue
+  LoadError
+end
 
 module HasMeta
+  
+  extend ActiveSupport::Autoload
+
+  autoload :MetaData
+  autoload :MetaQuery
+  autoload :QueryMethods
+  autoload :DynamicMethods
+  autoload :InstanceMethods
+  autoload :VERSION
   
   def meta_attributes
     nil
