@@ -1,4 +1,4 @@
-class HasMetaMigration < ActiveRecord::Migration
+class HasMetaMigration < ActiveRecord::Migration[4.2]
 
   def self.up
     create_table :meta_data do |t|
