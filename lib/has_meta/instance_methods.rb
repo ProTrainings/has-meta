@@ -1,8 +1,8 @@
 module HasMeta
   module InstanceMethods
-
+    
     def meta_get key
-      self.meta_data.where(key: key.to_s).first.value
+      self.meta_data.where(key: key.to_s).try(:first).try(:value)
     end
   
     def meta_set key, value

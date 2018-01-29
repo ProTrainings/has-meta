@@ -7,11 +7,16 @@ ActiveRecord::Schema.define version: 0 do
     t.integer   :integer_value
     t.decimal   :decimal_value, precision: 6, scale: 2
     t.date      :date_value
+    t.timestamp :created_at
+    t.timestamp :updated_at
   end
   
   create_table :meta_models, force: true do |t|
-    t.string :name
-    t.string :type
+    t.string  :name
+    t.integer :age
+    t.decimal :rating
+    t.date    :date_of_birth
+    t.string  :type
   end
   
   create_table :target_models, force: true do |t|

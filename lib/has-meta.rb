@@ -16,6 +16,7 @@ module HasMeta
   extend ActiveSupport::Autoload
 
   autoload :MetaData
+  autoload :DataMover
   autoload :MetaQuery
   autoload :QueryMethods
   autoload :DynamicMethods
@@ -43,8 +44,8 @@ module HasMeta
       include HasMeta::DynamicMethods
       include HasMeta::QueryMethods
     end
-  end 
-      
+  end
+        
 end 
 
 ActiveSupport.on_load :active_record do
