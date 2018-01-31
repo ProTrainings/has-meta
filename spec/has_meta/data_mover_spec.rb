@@ -59,6 +59,13 @@ RSpec.describe HasMeta::DataMover do
       expect(instance.date_of_birth).to eq(instance.foo_bar)
     end
     
+    it 'coerces type \'string\' to type \'text\'' do
+      clear_data!
+      instance = MetaModel.create name: 'example'
+      described_class.new('meta_models', 'name', 'string', 'foo_bar').execute
+      expect(instance.name).to eq(instance.foo_bar)
+    end
+    
   end
   
 end
