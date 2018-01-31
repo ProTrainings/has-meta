@@ -113,20 +113,20 @@ new_part.stanard_id # => 2
 
 ```ruby
 Part.find_by_catalog_number 12345  
-  # => #<Part id: 1, name: "Fancy new part">
+# => #<Part id: 1, name: "Fancy new part">
     
 Part.find_by_standard_id 2  
-  # => #<Part id: 1, name: "Fancy new part">
+# => #<Part id: 1, name: "Fancy new part">
 ```
 
-You may also use `with_meta` method to return a scope of Parts with correspoding meta attribute values:
+You may also use `with_meta` method to return a scope of parts with correspoding meta attribute values:
 
 ```ruby
 another_part = Part.create name: 'Another fancy new part'
 another_part.update standard: new_standard
 
 Part.with_meta standard: new_standard
-  # => #<ActiveRecord::Relation [#<Part id: 1, name: "Fancy new part">, 
+# => #<ActiveRecord::Relation [#<Part id: 1, name: "Fancy new part">, 
     #<Part id: 2, name: "Another fancy new part">]>
 ```
 
@@ -138,16 +138,16 @@ yet_another_part.update catalog_number: 12345
 
 
 Part.with_meta({standard: new_standard, catalog_number: 12345}, any: true)
-  # => #<ActiveRecord::Relation [#<Part id: 1, name: "Fancy new part">, 
-    #<Part id: 2, name: "Another fancy new part">, 
-    #<Part id: 3, name: "Yet another fancy new part">]>
+# => #<ActiveRecord::Relation [#<Part id: 1, name: "Fancy new part">, 
+  #<Part id: 2, name: "Another fancy new part">, 
+  #<Part id: 3, name: "Yet another fancy new part">]>
 ```
 
 Calling `excluding_meta` will return all records not meeting the criteria:
 
 ```ruby
-Part.without_meta catalog_number: 12345
-  # => #<ActiveRecord::Relation [#<Part id: 2, name: "Another fancy new part">]>
+Part.excluding_meta catalog_number: 12345
+# => #<ActiveRecord::Relation [#<Part id: 2, name: "Another fancy new part">]>
 ```
   
 ## TODO/Known Issues
