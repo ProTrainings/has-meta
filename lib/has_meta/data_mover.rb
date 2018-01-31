@@ -1,6 +1,6 @@
 module HasMeta
   class DataMover
-    def initialize table, attribute, key, type
+    def initialize table, attribute, type, key
       @table      = table
       @attribute  = attribute
       @key        = key
