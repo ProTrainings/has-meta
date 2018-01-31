@@ -5,6 +5,7 @@ module HasMeta
       @attribute  = attribute
       @key        = key
       @type       = type
+      resolve_type
     end
 
     def execute
@@ -20,15 +21,15 @@ module HasMeta
 
       self
     end
-    
-    def generate_migration
-      # to implement
-    end
-    
+        
     private
     
     attr_accessor :abort
     attr_reader :table, :attribute, :key, :type
+    
+    def resolve_type
+      type = 'text' if type == 'string'
+    end
     
     def source_values
       migrateable_source_values
