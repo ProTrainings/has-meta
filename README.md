@@ -32,7 +32,7 @@ rails db:migrate
 
 ## Usage
 
-###Declaring Meta Attributes
+### Declaring Meta Attributes
 
 Suppose we have a model `Part` and only a minority of our parts records have the attribute `catalog_number` populated.  We want to move `catalog_number` to our key/value store.
 
@@ -67,30 +67,30 @@ has_meta :catalog_number
 Now, we can use normal getters and setters to access the attribute:
 
 ```ruby
-new_part = Part.create name: 'Fancy New Part'  
+new_part = Part.create name: 'Fancy new part'  
 new_part.catalog_number = 12345  
 new_part.save
 
 new_part.catalog_number  
-#=> 12345
+# => 12345
 ```
 
 You can update the attribute any way you would with other attributes managed by Active Record:
 
 ```ruby
 new_part.update catalog_number: 67890  
-new_part.catalog_number #=> 67890  
+new_part.catalog_number # => 67890  
 
 new_part.attributes = {catalog_number: 12345}  
-new_part.catalog_number #=> 12345  
+new_part.catalog_number # => 12345  
 ```
 
-NB: Declaring a meta attribute on a model creates a polymorphic relationship between the model and the MetaData model. Therefore, the parent model must be saves before assigning meta attributes.
+**NB**: Declaring a meta attribute on a model creates a polymorphic relationship between the model and the MetaData model. Therefore, the parent model must be saved before assigning meta attributes.
 
 Meta attributes may also represent an Active Record model. Perhaps some of our parts may conform to a uniform standard represented by class `Standard`.  Just declare the meta attribute `:standard` and `has-meta` will treat the meta attribute as a one-to-one relation if the attribute corresponds to an Active Record model in your app.
 
 ```ruby
-has_meta :standard
+has_meta :catalog_number, :standard
 ```
 
 Now you can get or set the attribute using either object or the object id as you would with any other attribute:
@@ -98,25 +98,25 @@ Now you can get or set the attribute using either object or the object id as you
 ```ruby
 new_standard = Standard.create name: 'Some great standard'  
 new_part.standard = new_standard  
-new_part.stanard #=> #<Standard id: 1, name: "Some great standard">  
-new_part.stanard_id #=> 1  
+new_part.stanard # => #<Standard id: 1, name: "Some great standard">  
+new_part.stanard_id # => 1  
 
 newer_standard = Standard.create name 'An even better standard'  
 new_part.standard.id = newer_standard.id  
-new_part.stanard #=> #<Standard id: 2, name: "An even better standard">  
-new_part.stanard_id #=> 2  
+new_part.stanard # => #<Standard id: 2, name: "An even better standard">  
+new_part.stanard_id # => 2  
 ```
 
-###Finding by meta attributes
+### Finding by meta attributes
 
 `find_by_attribute_name` methods are provided for meta attributes.  For attributes representing an Active Record model, use `find_by_attribute_id`:
 
 ```ruby
 Part.find_by_catalog_number 12345  
-  #=> #<Part id: 1, name: " ">
+  # => #<Part id: 1, name: "Fancy new part">
     
 Part.find_by_standard_id 2  
-  #=> #<Part id: 1, name: " ">
+  # => #<Part id: 1, name: "Fancy new part">
 ```
 
 You may also use `with_meta` method to return a scope of Parts with correspoding meta attribute values:
@@ -126,7 +126,8 @@ another_part = Part.create name: 'Another fancy new part'
 another_part.update standard: new_standard
 
 Part.with_meta standard: new_standard
-  #=> #<ActiveRecord::Relation [#<Part id: 1, name: "Fancy New Part">, #<Part id: 2, name: "Another fancy new part">]>
+  # => #<ActiveRecord::Relation [#<Part id: 1, name: "Fancy new part">, 
+    #<Part id: 2, name: "Another fancy new part">]>
 ```
 
 `with_meta` accepts the `any: true` option to match any condition provided:
@@ -137,14 +138,16 @@ yet_another_part.update catalog_number: 12345
 
 
 Part.with_meta({standard: new_standard, catalog_number: 12345}, any: true)
-  #=> #<ActiveRecord::Relation [#<Part id: 1, name: "Fancy New Part">, #<Part id: 2, name: "Another fancy new part">, #<Part id: 3, name: "Yet another fancy new part">]>
+  # => #<ActiveRecord::Relation [#<Part id: 1, name: "Fancy new part">, 
+    #<Part id: 2, name: "Another fancy new part">, 
+    #<Part id: 3, name: "Yet another fancy new part">]>
 ```
 
 Calling `excluding_meta` will return all records not meeting the criteria:
 
 ```ruby
 Part.without_meta catalog_number: 12345
-  #=> #<ActiveRecord::Relation [#<Part id: 2, name: "Another fancy new part">]>
+  # => #<ActiveRecord::Relation [#<Part id: 2, name: "Another fancy new part">]>
 ```
   
 ## TODO/Known Issues
