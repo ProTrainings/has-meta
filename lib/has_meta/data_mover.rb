@@ -49,7 +49,7 @@ module HasMeta
     end
     
     def format_values row
-      "('#{table.classify.constantize.name}', #{row.id}, '#{key}', #{escape(row.send(:"#{attribute}"))}, '#{Time.now}'),"
+      "('#{table.classify.constantize.name}', #{row.id}, '#{key}', #{escape(row.send(:"#{attribute}"))}, #{timestamp}),"
     end
     
     def escape value
@@ -57,6 +57,15 @@ module HasMeta
         "'#{value}'"
       else
         value
+      end
+    end
+    
+    def timestamp
+      case ::ActiveRecord::Base.connection.adapter_name
+      when 'Mysql2'
+        'NOW()'
+      when 'SQLite'
+        "'#{Time.now}'"
       end
     end
     
