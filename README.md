@@ -1,6 +1,7 @@
 # Has-Meta
-
 A key/value store solution for Rails apps with bloated tables
+
+[![Build Status](https://travis-ci.org/ProTrainings/has-meta.svg?branch=master)](https://travis-ci.org/ProTrainings/has-meta) 
 
 ## Installation
 
