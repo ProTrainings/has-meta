@@ -193,7 +193,6 @@ RSpec.describe HasMeta do
     end
   end
   
-  # These seem to be more of integration tests
   describe 'dynamic getters and setters' do
     
     context 'normal attribute \'foo_bar\'' do
@@ -325,59 +324,69 @@ RSpec.describe HasMeta do
   describe 'dynamic class method getters (find_by_x)' do
 
     context 'normal attribute \'foo_bar\'' do
-      instance = MetaModel.create name: "Example"
-      value = 1
-      instance.foo_bar = value
+
+      before :context do
+        @instance = MetaModel.create name: "Example"
+        @value = 1
+        @instance.foo_bar = @value  
+      end
+      
       it 'returns an array' do
-        expect(MetaModel.find_by_foo_bar value).to be_a(Array)
+        expect(MetaModel.find_by_foo_bar @value).to be_a(Array)
       end
       
       it 'array contains MetaModel instance' do
-        expect(MetaModel.find_by_foo_bar value).to contain_exactly(instance)
+        expect(MetaModel.find_by_foo_bar @value).to contain_exactly(@instance)
       end
       
       it 'returns multiple matches' do
         another_instance = MetaModel.create name: "Example"
-        another_instance.foo_bar = value
-        expect(MetaModel.find_by_foo_bar value).to contain_exactly(instance, another_instance)
+        another_instance.foo_bar = @value
+        expect(MetaModel.find_by_foo_bar @value).to contain_exactly(@instance, another_instance)
       end
     end
     
     context 'normal attribute with _id suffix' do
-      instance = MetaModel.create name: "Example"
-      value = 1
-      instance.foo_id = value
+      before :context do
+        @instance = MetaModel.create name: "Example"
+        @value = 1
+        @instance.foo_id = @value
+      end
+      
       it 'returns an array' do
-        expect(MetaModel.find_by_foo_id value).to be_a(Array)
+        expect(MetaModel.find_by_foo_id @value).to be_a(Array)
       end
       
       it 'array contains MetaModel instance' do
-        expect(MetaModel.find_by_foo_id value).to contain_exactly(instance)
+        expect(MetaModel.find_by_foo_id @value).to contain_exactly(@instance)
       end
       
       it 'returns multiple matches' do
         another_instance = MetaModel.create name: "Example"
-        another_instance.foo_id = value
-        expect(MetaModel.find_by_foo_id value).to contain_exactly(instance, another_instance)
+        another_instance.foo_id = @value
+        expect(MetaModel.find_by_foo_id @value).to contain_exactly(@instance, another_instance)
       end
     end
 
     context 'attribute representing an active record model' do
-      instance = MetaModel.create name: "Example"
-      target_instance = TargetModel.create name: "Example"
-      instance.target_model = target_instance
+      before :context do
+        @instance = MetaModel.create name: "Example"
+        @target_instance = TargetModel.create name: "Example"
+        @instance.target_model = @target_instance
+      end
+      
       it 'returns an array' do
-        expect(MetaModel.find_by_target_model_id target_instance.id).to be_a(Array)
+        expect(MetaModel.find_by_target_model_id @target_instance.id).to be_a(Array)
       end
       
       it 'array contains MetaModel instance' do
-        expect(MetaModel.find_by_target_model_id target_instance.id).to contain_exactly(instance)
+        expect(MetaModel.find_by_target_model_id @target_instance.id).to contain_exactly(@instance)
       end
       
       it 'returns multiple matches' do
         another_instance = MetaModel.create name: "Example"
-        another_instance.target_model = target_instance
-        expect(MetaModel.find_by_target_model_id target_instance.id).to contain_exactly(instance, another_instance)
+        another_instance.target_model = @target_instance
+        expect(MetaModel.find_by_target_model_id @target_instance.id).to contain_exactly(@instance, another_instance)
       end
     end
  
