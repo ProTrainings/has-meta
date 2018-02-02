@@ -1,4 +1,4 @@
-# Has::Meta
+# Has-Meta
 
 A key/value store solution for Rails apps with bloated tables
 
@@ -24,7 +24,7 @@ Then, install migrations:
 rake has_meta_engine:install:migrations
 ```
 
-Finally, review the migrations an migrate:
+Finally, review the migrations and migrate:
 
 ```ruby
 rails db:migrate
@@ -52,9 +52,10 @@ You may also choose to migrate existing data from a table:
 
     $ rake "has_meta_engine:data_mover[parts, catalog_number, integer, catalog_number]"
     
-Next generate a migration to remove the column:
+Once that data is moved generate a migration to remove the column and run the migration:
 
-    $ rails generate migration RevmoveCatalogNumberFromParts catalog_number:integer
+    $ rake generate migration RevmoveCatalogNumberFromParts catalog_number:integer
+    $ rake db:migrate
     
 And finally, declare the meta attribute in the model
 
@@ -85,7 +86,7 @@ new_part.attributes = {catalog_number: 12345}
 new_part.catalog_number # => 12345  
 ```
 
-**NB**: Declaring a meta attribute on a model creates a polymorphic relationship between the model and the MetaData model. Therefore, the parent model must be saved before assigning meta attributes.
+**NB**: _Declaring a meta attribute on a model creates a polymorphic relationship between the model and the MetaData model. Therefore, the parent model must be saved before assigning meta attributes._
 
 Meta attributes may also represent an Active Record model. Perhaps some of our parts may conform to a uniform standard represented by class `Standard`.  Just declare the meta attribute `:standard` and `has-meta` will treat the meta attribute as a one-to-one relation if the attribute corresponds to an Active Record model in your app.
 
@@ -98,13 +99,13 @@ Now you can get or set the attribute using either object or the object id as you
 ```ruby
 new_standard = Standard.create name: 'Some great standard'  
 new_part.standard = new_standard  
-new_part.stanard # => #<Standard id: 1, name: "Some great standard">  
-new_part.stanard_id # => 1  
+new_part.standard # => #<Standard id: 1, name: "Some great standard">  
+new_part.standard_id # => 1  
 
 newer_standard = Standard.create name 'An even better standard'  
 new_part.standard.id = newer_standard.id  
-new_part.stanard # => #<Standard id: 2, name: "An even better standard">  
-new_part.stanard_id # => 2  
+new_part.standard # => #<Standard id: 2, name: "An even better standard">  
+new_part.standard_id # => 2  
 ```
 
 ### Finding by meta attributes
@@ -152,17 +153,16 @@ Part.excluding_meta catalog_number: 12345
   
 ## TODO/Known Issues
 `has-meta` was developed for Active Record 4.2+ and MySQL 5.5.  PRs for supporting earlier versions of Active Record and/or PostgreSQL are welcome!
-  
-## Development
-
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
-
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/has-meta.
+Bug reports and pull requests are welcome on GitHub at https://github.com/protrainings/has-meta.
 
 ## License
 
-The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+Has-Meta is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+
+## About ProTrainings
+Has-Meta was written by [Dan Drust](https://www.github.com/dandrust).  It is maintained and funded by Protrainings, LLC. Has-Meta, names, and logos are copyright ProTrainings, LLC. 
+
+
