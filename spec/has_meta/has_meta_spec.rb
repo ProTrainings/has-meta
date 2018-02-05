@@ -226,6 +226,13 @@ RSpec.describe HasMeta do
           expect(instance.foo_bar).to eq(new_value)
         end
       end
+
+      describe 'setting value to nil' do
+        it 'removes record' do
+          instance.foo_bar = nil
+          expect(instance.meta_data.where key: :foo_bar).to be_empty
+        end
+      end
       
     end
     
