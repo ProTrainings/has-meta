@@ -14,7 +14,8 @@ module HasMeta
     end
   
     def meta_set! key, value
-      meta_set(key, value).save
+      result = meta_set(key, value)
+      result.respond_to?(:save) ? result.save : result
     end
     
     def meta_destroy key
