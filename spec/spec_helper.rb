@@ -3,7 +3,6 @@ require 'active_record'
 require 'active_record/version'
 require 'active_support'
 require 'active_support/core_ext'
-require 'pry'
 require 'has-meta'
 
 Dir['./spec/support/**/*.rb'].sort.each { |f| require f }
