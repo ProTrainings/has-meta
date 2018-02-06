@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    has-meta (0.8.1)
+    has-meta (0.8.2)
       activerecord (>= 4.2.8)
 
 GEM
