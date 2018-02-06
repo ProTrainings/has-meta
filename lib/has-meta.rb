@@ -2,8 +2,6 @@
 # require 'active_record/version'
 # require 'active_support/core_ext/module'
 
-require 'pry'
-
 begin
   require 'rails/engine'
   require 'has_meta/engine'
