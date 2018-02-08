@@ -70,6 +70,8 @@ module HasMeta
         return :decimal, value
       when ->(x) {x.kind_of? Date}
         return :date, value
+      when ->(x) {x.acts_like? :time}
+        return :datetime, value
       when ->(x) {x.respond_to? :id}
         return :integer, value.id
       else

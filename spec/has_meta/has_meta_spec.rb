@@ -485,5 +485,123 @@ RSpec.describe HasMeta do
     end
   
   end
+
+  describe 'getting and setting meta attributes' do
+    context 'when given a date' do
+      before :context do
+        @instance = MetaModel.create
+        @value = Date.today
+        @instance.foo_bar = @value
+      end
+
+      it 'it returns a date' do
+        expect(@instance.foo_bar).to be_a(Date)
+      end
+    end
+
+    context 'when given a stringy date' do
+      before :context do
+        @instance = MetaModel.create
+        @value = Date.today.to_s
+        @instance.foo_bar = @value
+      end
+
+      it 'it returns a date' do
+        expect(@instance.foo_bar).to be_a(Date)
+      end
+    end
+
+    context 'when given an integer' do
+      before :context do
+        @instance = MetaModel.create
+        @value = 12345
+        @instance.foo_bar = @value
+      end
+
+      it 'it returns a integer' do
+        expect(@instance.foo_bar).to be_a(Integer)
+      end
+
+    end
+
+    context 'when given a stringy integer' do
+      before :context do
+        @instance = MetaModel.create
+        @value = '12345'
+        @instance.foo_bar = @value
+      end
+
+      it 'it returns a integer' do
+        expect(@instance.foo_bar).to be_a(Integer)
+      end
+
+    end
+    
+    context 'when given a large integer' do
+      before :context do
+        @instance = MetaModel.create
+        @value = 2000000001
+        @instance.foo_bar = @value
+      end
+
+      it 'it returns a integer' do
+        expect(@instance.foo_bar).to be_a(Integer)
+      end
+
+
+      context 'that\'s stringy' do
+        before :context do
+          @instance = MetaModel.create
+          @value = '2000000001'
+          @instance.foo_bar = @value
+        end
+
+        it 'it returns a integer' do
+          expect(@instance.foo_bar).to be_a(Integer)
+        end
+
+      end
+
+    end
+
+    context 'when given a time' do
+      before :context do
+        @instance = MetaModel.create
+        @value = Time.now
+        @instance.foo_bar = @value
+      end
+
+      it 'it returns a time' do
+        expect(@instance.foo_bar.acts_like? :time).to be true
+      end
+
+    end
+
+    context 'when given a float' do
+      before :context do
+        @instance = MetaModel.create
+        @value = 12.345
+        @instance.foo_bar = @value
+      end
+
+      it 'it returns a big decimal' do
+        expect(@instance.foo_bar).to be_a(BigDecimal)
+      end
+
+      context 'that\'s stringy' do
+        before :context do
+          @instance = MetaModel.create
+          @value = '12.345'
+          @instance.foo_bar = @value
+        end
+
+        it 'it returns a big decimal' do
+          expect(@instance.foo_bar).to be_a(BigDecimal)
+        end
+        
+      end
+
+    end
+  end
   
 end
