@@ -80,14 +80,18 @@ module HasMeta
       when ->(x) {x.kind_of? Date}
         return :date, value
       when ->(x) {x.acts_like? :time}
-        return :datetime, value
+        if has_datetime_column?
+          return :datetime, value
+        else
+          return :text, value
+        end
       when ->(x) {x.respond_to? :id}
         return :integer, value.id
       else
         return :integer, value.to_i if value =~ /^-?\d+$/
         return :decimal, value.to_f if value =~ /^-?\d*\.\d+$/
         return :date, value.to_date if date_try_convert value
-        return :datetime, value.to_datetime if datetime_try_convert value
+        return :datetime, value.to_datetime if has_datetime_column? and datetime_try_convert(value)
         return :text, value
       end            
     end
@@ -129,5 +133,8 @@ module HasMeta
       self[:"#{@data_type}_value"] = @value
     end
     
+    def self.has_datetime_column?
+      self.column_names.include? 'datetime_value'
+    end
   end
 end
