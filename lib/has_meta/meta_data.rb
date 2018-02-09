@@ -91,7 +91,7 @@ module HasMeta
         return :integer, value.to_i if value =~ /^-?\d+$/
         return :decimal, value.to_f if value =~ /^-?\d*\.\d+$/
         return :date, value.to_date if date_try_convert value
-        return :datetime, value.to_datetime if datetime_try_convert(value) and has_datetime_column?
+        return :datetime, value.to_datetime if has_datetime_column? and datetime_try_convert(value)
         return :text, value
       end            
     end
