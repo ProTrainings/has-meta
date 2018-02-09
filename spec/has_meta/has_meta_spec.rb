@@ -644,5 +644,25 @@ RSpec.describe HasMeta do
     end
 
   end
+
+  describe '.meta_set' do
+    context 'when passed :as option' do
+      before :each do
+        @instance = MetaModel.create
+        @value = Time.now.to_s
+        @instance.meta_set :foo_bar, @value, as: :text
+      end
+
+      subject {@instance.meta_data.first}
+
+      it 'is stored as text' do
+        expect(subject.text_value).to eq(@value)
+      end
+
+      it 'isn\'t stored as datetime' do
+        expect(subject.datetime_value).to be_nil
+      end
+    end
+  end
   
 end

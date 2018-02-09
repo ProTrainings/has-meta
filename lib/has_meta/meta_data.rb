@@ -10,8 +10,13 @@ module HasMeta
       @value ||= convert_type value_attributes.compact.values.pop
     end
     
-    def value= value
-      @data_type, @value = resolve_data_type! value
+    def value= value, options={}
+      if options[:as]
+        @data_type = options[:as]
+        @value = value
+      else
+        @data_type, @value = resolve_data_type! value
+      end
       set_attribute
     end
         
