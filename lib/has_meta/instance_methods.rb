@@ -5,11 +5,12 @@ module HasMeta
       self.meta_data.where(key: key.to_s).try(:first).try(:value)
     end
   
-    def meta_set key, value
+    def meta_set key, value, options={}
       return meta_destroy key if value.nil? or value == ''
     
       meta = self.meta_data.where(key: key.to_s).first_or_create
-      meta.value = value
+      # meta.value = value
+      meta.send :value=, value, options
       meta
     end
   

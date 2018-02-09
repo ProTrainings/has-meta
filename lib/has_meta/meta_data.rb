@@ -7,11 +7,16 @@ module HasMeta
     attr_reader :data_type
 
     def value
-      @value ||= value_attributes.compact.values.pop
+      @value ||= convert_type value_attributes.compact.values.pop
     end
     
-    def value= value
-      @data_type, @value = resolve_data_type! value
+    def value= value, options={}
+      if options[:as]
+        @data_type = options[:as]
+        @value = value
+      else
+        @data_type, @value = resolve_data_type! value
+      end
       set_attribute
     end
         
@@ -40,6 +45,22 @@ module HasMeta
     
     private
     
+    def convert_type value
+      begin
+        if value =~ /^-?\d+/ and value.to_i > 2000000000
+          value.to_i
+        elsif value =~ /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} (\+|-)\d{4}$/
+          value.to_time
+        elsif value =~ /^\d{4}-\d{2}-\d{2}$/
+          value.to_date
+        else
+          value
+        end
+      rescue
+        value
+      end
+    end
+
     def self.value_hash_for value
       data_type, value = resolve_data_type! value
       {"#{data_type}_value": value}
@@ -58,13 +79,33 @@ module HasMeta
         return :decimal, value
       when ->(x) {x.kind_of? Date}
         return :date, value
+      when ->(x) {x.acts_like? :time}
+        return :datetime, value
       when ->(x) {x.respond_to? :id}
         return :integer, value.id
       else
         return :integer, value.to_i if value =~ /^-?\d+$/
         return :decimal, value.to_f if value =~ /^-?\d*\.\d+$/
+        return :date, value.to_date if date_try_convert value
+        return :datetime, value.to_datetime if datetime_try_convert value
         return :text, value
       end            
+    end
+    
+    def self.date_try_convert value
+      begin
+        value.to_date if value =~ /^\d{4}-\d{2}-\d{2}$/
+      rescue
+        nil
+      end
+    end
+
+    def self.datetime_try_convert value
+      begin
+        value.to_datetime if value =~ /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} (\+|-)\d{4}$/
+      rescue
+        nil
+      end
     end
     
     def resolve_data_type! value

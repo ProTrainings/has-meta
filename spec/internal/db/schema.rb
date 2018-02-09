@@ -7,8 +7,9 @@ ActiveRecord::Schema.define version: 0 do
     t.integer   :integer_value
     t.decimal   :decimal_value, precision: 6, scale: 2
     t.date      :date_value
-    t.timestamp :created_at
-    t.timestamp :updated_at
+    t.datetime  :datetime_value
+    t.datetime  :created_at
+    t.datetime  :updated_at
   end
   
   create_table :meta_models, force: true do |t|

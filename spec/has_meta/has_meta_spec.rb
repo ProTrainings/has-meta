@@ -485,5 +485,184 @@ RSpec.describe HasMeta do
     end
   
   end
+
+  describe 'getting and setting meta attributes' do
+    context 'when given a date' do
+      before :context do
+        @instance = MetaModel.create
+        @value = Date.today
+        @instance.foo_bar = @value
+      end
+
+      it 'it returns a date' do
+        expect(@instance.foo_bar).to be_a(Date)
+      end
+
+      context 'that\'s stringy' do
+        before :context do
+          @instance = MetaModel.create
+          @value = Date.today.to_s
+          @instance.foo_bar = @value
+        end
+
+        it 'it returns a date' do
+          expect(@instance.foo_bar).to be_a(Date)
+        end
+      end
+    end
+    
+    context 'when date is stored as text' do
+      before :context do
+        @instance = MetaModel.create
+        @value = Date.today.to_s
+        @instance.meta_data.create key: :foo_bar, text_value: @value
+      end
+
+      it 'is stored as text' do
+        expect(@instance.meta_data.where(key: :foo_bar).first.text_value).to eq(@value)
+      end
+
+      it 'isn\'t stored as date' do
+        expect(@instance.meta_data.where(key: :foo_bar).first.date_value).to be_nil
+      end
+
+      it 'it returns a date' do
+        expect(@instance.foo_bar).to be_a(Date)
+      end
+    end
+
+    context 'when given an integer' do
+      before :context do
+        @instance = MetaModel.create
+        @value = 12345
+        @instance.foo_bar = @value
+      end
+
+      it 'it returns a integer' do
+        expect(@instance.foo_bar).to be_a(Integer)
+      end
+
+    end
+
+    context 'when given a stringy integer' do
+      before :context do
+        @instance = MetaModel.create
+        @value = '12345'
+        @instance.foo_bar = @value
+      end
+
+      it 'it returns a integer' do
+        expect(@instance.foo_bar).to be_a(Integer)
+      end
+
+    end
+    
+    context 'when given a large integer' do
+      before :context do
+        @instance = MetaModel.create
+        @value = 2000000001
+        @instance.foo_bar = @value
+      end
+
+      it 'it returns a integer' do
+        expect(@instance.foo_bar).to be_a(Integer)
+      end
+
+
+      context 'that\'s stringy' do
+        before :context do
+          @instance = MetaModel.create
+          @value = '2000000001'
+          @instance.foo_bar = @value
+        end
+
+        it 'it returns a integer' do
+          expect(@instance.foo_bar).to be_a(Integer)
+        end
+
+      end
+
+    end
+
+    context 'when given a time' do
+      before :context do
+        @instance = MetaModel.create
+        @value = Time.now
+        @instance.foo_bar = @value
+      end
+
+      it 'it returns a time' do
+        expect(@instance.foo_bar.acts_like? :time).to be true
+      end
+
+    end
+
+    context 'when a time is stored as text' do
+      before :context do
+        @instance = MetaModel.create
+        @value = Time.now.to_s
+        @instance.meta_data.create key: :foo_bar, text_value: @value
+      end
+
+      it 'is stored as text' do
+        expect(@instance.meta_data.where(key: :foo_bar).first.text_value).to eq(@value)
+      end
+
+      it 'isn\'t stored as datetime' do
+        expect(@instance.meta_data.where(key: :foo_bar).first.datetime_value).to be_nil
+      end
+
+      it 'it returns a time' do
+        expect(@instance.foo_bar.acts_like? :time).to be true
+      end
+    end
+
+    context 'when given a float' do
+      before :context do
+        @instance = MetaModel.create
+        @value = 12.345
+        @instance.foo_bar = @value
+      end
+
+      it 'it returns a big decimal' do
+        expect(@instance.foo_bar).to be_a(BigDecimal)
+      end
+
+      context 'that\'s stringy' do
+        before :context do
+          @instance = MetaModel.create
+          @value = '12.345'
+          @instance.foo_bar = @value
+        end
+
+        it 'it returns a big decimal' do
+          expect(@instance.foo_bar).to be_a(BigDecimal)
+        end
+        
+      end
+
+    end
+
+  end
+
+  describe '.meta_set' do
+    context 'when passed :as option' do
+      before :each do
+        @instance = MetaModel.create
+        @value = Time.now.to_s
+        @instance.meta_set :foo_bar, @value, as: :text
+      end
+
+      subject {@instance.meta_data.first}
+
+      it 'is stored as text' do
+        expect(subject.text_value).to eq(@value)
+      end
+
+      it 'isn\'t stored as datetime' do
+        expect(subject.datetime_value).to be_nil
+      end
+    end
+  end
   
 end

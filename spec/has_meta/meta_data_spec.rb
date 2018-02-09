@@ -29,6 +29,13 @@ RSpec.describe HasMeta::MetaData do
         expect(described_class.resolve_data_type!(value)).to match_array([:date, value])
       end
     end
+
+    context 'when passed a stringy date' do
+      it 'returns correct type and value' do
+        value = Date.today.to_s
+        expect(described_class.resolve_data_type!(value)).to match_array([:date, value.to_date])
+      end
+    end
     
     context 'when passed text' do
       it 'returns correct type and value' do
