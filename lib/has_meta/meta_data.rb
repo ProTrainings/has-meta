@@ -44,6 +44,10 @@ module HasMeta
       begin
         if value =~ /^-?\d+/ and value.to_i > 2000000000
           value.to_i
+        elsif value =~ /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} (\+|-)\d{4}$/
+          value.to_time
+        elsif value =~ /^\d{4}-\d{2}-\d{2}$/
+          value.to_date
         else
           value
         end
@@ -78,13 +82,22 @@ module HasMeta
         return :integer, value.to_i if value =~ /^-?\d+$/
         return :decimal, value.to_f if value =~ /^-?\d*\.\d+$/
         return :date, value.to_date if date_try_convert value
+        return :datetime, value.to_datetime if datetime_try_convert value
         return :text, value
       end            
     end
     
     def self.date_try_convert value
       begin
-        value.to_date
+        value.to_date if value =~ /^\d{4}-\d{2}-\d{2}$/
+      rescue
+        nil
+      end
+    end
+
+    def self.datetime_try_convert value
+      begin
+        value.to_datetime if value =~ /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} (\+|-)\d{4}$/
       rescue
         nil
       end
