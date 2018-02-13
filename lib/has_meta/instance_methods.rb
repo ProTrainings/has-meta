@@ -24,7 +24,7 @@ module HasMeta
     end
 
     def save_pending_meta_attributes
-      self.meta_attributes_pending_save.each { |key, v| meta_set key, v[:value], v[:options] }
+      self.meta_attributes_pending_save.each { |key, v| meta_set! key, v[:value], v[:options] }
       self.meta_attributes_pending_save.clear
     end
 
