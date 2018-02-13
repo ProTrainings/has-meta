@@ -38,6 +38,9 @@ module HasMeta
 
     class_eval do
       has_many :meta_data, as: :meta_model, dependent: :destroy, class_name: '::HasMeta::MetaData'
+      attr_accessor :meta_attributes_pending_save
+      after_save :save_pending_meta_attributes, 
+        if: ->(x) { x.persisted? and x.meta_attributes_pending_save.present? }
       include HasMeta::InstanceMethods
       include HasMeta::DynamicMethods
       include HasMeta::QueryMethods
