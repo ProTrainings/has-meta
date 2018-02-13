@@ -87,8 +87,6 @@ new_part.attributes = {catalog_number: 12345}
 new_part.catalog_number # => 12345  
 ```
 
-**NB**: _Declaring a meta attribute on a model creates a polymorphic relationship between the model and the MetaData model. Therefore, the parent model must be saved before assigning meta attributes._
-
 Meta attributes may also represent an Active Record model. Perhaps some of our parts may conform to a uniform standard represented by class `Standard`.  Just declare the meta attribute `:standard` and `has-meta` will treat the meta attribute as a one-to-one relation if the attribute corresponds to an Active Record model in your app.
 
 ```ruby
