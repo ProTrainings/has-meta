@@ -2,18 +2,32 @@ module HasMeta
   module InstanceMethods
     
     def meta_get key
+      return self.meta_attributes_pending_save[key][:value] if self.meta_attributes_pending_save.try(:[], key).present?
+
       self.meta_data.where(key: key.to_s).try(:first).try(:value)
     end
   
     def meta_set key, value, options={}
       return meta_destroy key if value.nil? or value == ''
-    
-      meta = self.meta_data.where(key: key.to_s).first_or_create
-      # meta.value = value
-      meta.send :value=, value, options
-      meta
+      if self.persisted?
+        meta = self.meta_data.where(key: key.to_s).first_or_create
+        meta.send :value=, value, options
+        meta
+      else
+        add_to_pending_save key => {value: value, options: options}
+      end
     end
   
+    def add_to_pending_save args
+      self.meta_attributes_pending_save ||= {}
+      self.meta_attributes_pending_save.merge!(args)
+    end
+
+    def save_pending_meta_attributes
+      self.meta_attributes_pending_save.each { |key, v| meta_set key, v[:value], v[:options] }
+      self.meta_attributes_pending_save.clear
+    end
+
     def meta_set! key, value
       result = meta_set(key, value)
       result.respond_to?(:save) ? result.save : result

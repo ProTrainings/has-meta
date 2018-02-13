@@ -664,5 +664,39 @@ RSpec.describe HasMeta do
       end
     end
   end
-  
+
+  describe 'setting meta attributes before parent model is saved' do
+    before :all do
+      @instance = MetaModel.new name: 'test', foo_bar: 'test'
+    end
+    
+    it 'return unsaved meta attribute value before save' do
+      expect(@instance.foo_bar).to eq('test')
+    end
+
+    it 'overwrites pending key/value pair when assigned again' do
+      @instance.foo_bar = 'new test string'
+      expect(@instance.foo_bar).to eq('new test string')
+    end
+
+    it 'creates sucessfully' do
+      success = @instance.save
+      expect(success).to be true
+    end
+    it 'saves parent' do
+      expect(@instance.persisted?).to be true 
+    end
+
+    it 'saves meta data' do
+      expect(@instance.meta_data).not_to be_empty
+    end
+
+    it 'saves correct value' do
+      expect(@instance.meta_data.first.text_value).to eq('new test string')
+    end
+
+    it 'clears pending save array' do
+      expect(@instance.meta_attributes_pending_save).to be_empty
+    end
+  end
 end
