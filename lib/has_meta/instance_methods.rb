@@ -24,12 +24,12 @@ module HasMeta
     end
 
     def save_pending_meta_attributes
-      self.meta_attributes_pending_save.each { |key, v| meta_set key, v[:value], v[:options] }
+      self.meta_attributes_pending_save.each { |key, v| meta_set! key, v[:value], v[:options] }
       self.meta_attributes_pending_save.clear
     end
 
-    def meta_set! key, value
-      result = meta_set(key, value)
+    def meta_set! key, value, options={}
+      result = meta_set(key, value, options)
       result.respond_to?(:save) ? result.save : result
     end
     
