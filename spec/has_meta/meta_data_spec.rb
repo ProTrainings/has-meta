@@ -10,7 +10,7 @@ RSpec.describe HasMeta::MetaData do
             
       context 'integer is too big' do
         it 'returns correct type and value' do
-          value = 2000000001
+          value = described_class.send(:max_integer_value) + 1
           expect(described_class.resolve_data_type!(value)).to match_array([:text, value.to_s])
         end
       end
