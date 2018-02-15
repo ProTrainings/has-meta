@@ -69,8 +69,7 @@ module HasMeta
     def self.resolve_data_type! value
       case value
       when ->(x) {x.kind_of? Integer}
-        # TODO: dynamically check for a range error (is this a ruby thing or mysql thing?)
-        if value < 2000000000
+        if value < max_integer_value
           return :integer, value
         else
           return :text, value.to_s
@@ -94,6 +93,12 @@ module HasMeta
         return :datetime, value.to_datetime if has_datetime_column? and datetime_try_convert(value)
         return :text, value
       end            
+    end
+    
+    def self.max_integer_value
+      column_limit = HasMeta::MetaData.column_for_attribute(:integer_value).limit
+      column_limit = 4 if column_limit.in? [nil, 11]
+      (256**column_limit)/2 - 1
     end
     
     def self.date_try_convert value
